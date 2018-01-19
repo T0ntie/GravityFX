@@ -16,6 +16,8 @@ public class FlyingObject extends GravityObject {
 	private final DoubleProperty yVelocity;
 	private final ReadOnlyDoubleWrapper speed;
 	double orientation = 0;
+	private boolean toBeDespawned = false;
+
 
 	public FlyingObject(double centerX, double centerY, double radius, double xVelocity, double yVelocity,
 			double mass) {
@@ -88,4 +90,14 @@ public class FlyingObject extends GravityObject {
 	{
 		this.orientation = orientation;
 	}
+	public boolean isToBeDespawned()
+	{
+		return this.toBeDespawned;
+	}
+	
+	public void despawn()
+	{
+		this.toBeDespawned = true;
+	}
+	
 }

@@ -8,7 +8,7 @@ import javafx.scene.shape.Circle;
 public class GravityObject {
 
 	protected final double mass;
-	protected final double radius;
+	protected  double radius; //final
 	protected final Circle view;
 	
     public GravityObject(double centerX, double centerY, double radius, double mass) {
@@ -36,6 +36,11 @@ public class GravityObject {
 	public double getRadius() {
 	     return radius;
 	 }
+	
+	public void setRadius(double r)
+	{
+		this.radius = r;
+	}
 
 	public final double getCenterX() {
 	     return view.getCenterX();

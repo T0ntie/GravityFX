@@ -37,6 +37,9 @@ public class Gravity extends Application {
 	private final FrameStats frameStats = new FrameStats();
 	private ObservableList<FlyingObject> flyingObjects = FXCollections.observableArrayList();
 	private ObservableList<Sol> sols = FXCollections.observableArrayList();
+	private ObservableList<HealthBar> healthBars = FXCollections.observableArrayList();
+
+	private final static Sound sound = new Sound(2);
 
 	private boolean worldCreated = false;
 
@@ -58,6 +61,8 @@ public class Gravity extends Application {
 				// only add once... prevent duplicates
 				if (!input.contains(code))
 					input.add(code);
+
+				Gravity.STATUS_MSG = code;
 			}
 		});
 
@@ -70,42 +75,34 @@ public class Gravity extends Application {
 
 		Canvas canvas = new Canvas(500, 500);
 
-		final Label stats = new Label("hi du schneemann");
+		final Label stats = new Label();
 		stats.setTextFill(Color.RED);
 
 		stats.textProperty().bind(frameStats.textProperty());
 
-		// root.getChildren().add(canvas);
-		// final BorderPane x= new BorderPane();
-		//
-		// root.getChildren().add(x);
-		// x.setCenter(new Label("in the center"));
-		// x.setBottom(stats);
+		final Pane canvasPane = new Pane();
+		canvasPane.getChildren().add(canvas);
 
-		final Pane x = new Pane();
-		x.getChildren().add(canvas);
-
-		root.setCenter(x);
+		root.setCenter(canvasPane);
 		root.setBottom(stats);
 
-		applyOnResizeListener(theScene, canvas, x);
+		// applyOnResizeListener(theScene, canvas, x);
 
-		GraphicsContext gc = canvas.getGraphicsContext2D();
-		// createCrafts();
 		startAnimation(canvas);
 
 		primaryStage.setFullScreenExitHint("");
 		primaryStage.setFullScreen(true);
 		primaryStage.show();
-		
+
 		primaryStage.fullScreenProperty().addListener(new ChangeListener<Boolean>() {
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+				sound.shutdown();
 				Platform.exit();
 			}
 		});
-		
-		canvas.setHeight(x.getHeight());
-		canvas.setWidth(x.getWidth());
+
+		canvas.setHeight(canvasPane.getHeight());
+		canvas.setWidth(canvasPane.getWidth());
 	}
 
 	private void startAnimation(final Canvas gameCanvas) {
@@ -115,12 +112,9 @@ public class Gravity extends Application {
 			public void handle(long timestamp) {
 				if (lastUpdateTime.get() > 0) {
 					long elapsedTime = timestamp - lastUpdateTime.get();
-					checkCollisions(gameCanvas.getWidth(), gameCanvas.getHeight());
+					checkCollisions(timestamp, gameCanvas.getWidth(), gameCanvas.getHeight());
 					updateWorld(timestamp, elapsedTime, gameCanvas);
 					frameStats.addFrame(elapsedTime);
-
-					gameCanvas.getGraphicsContext2D().strokeRect(0, 1, gameCanvas.getWidth() - 1,
-							gameCanvas.getHeight() - 1);
 				}
 				lastUpdateTime.set(timestamp);
 			}
@@ -144,6 +138,10 @@ public class Gravity extends Application {
 			so.show(gx, timestamp);
 		}
 
+		for (HealthBar bar : healthBars) {
+			bar.show(gx, timestamp);
+		}
+
 		List<FlyingObject> toBeRemoved = new ArrayList<FlyingObject>();
 		List<FlyingObject> toBeAdded = new ArrayList<FlyingObject>();
 
@@ -159,18 +157,10 @@ public class Gravity extends Application {
 				final double gravity = Math.min(so.getMass() * fo.getMass() / (distance * distance), 1000);
 
 				fo.addVelocity(deltaX / distance * gravity, deltaY / distance * gravity);
-
-				/*
-				 * double d = objectPos.distance(position); Point2D gv =
-				 * position.subtract(objectPos); gv = gv.normalize(); double gravity =
-				 * Math.min(GRAVITY/(d*d), MAX_GRAVITY); object.addVelocity(new
-				 * Point2D(gv.getX()*gravity, gv.getY()*gravity));
-				 */
 			}
 
 			if (fo instanceof Craft) {
-				Craft craft = (Craft) fo;
-				FlyingObject projectile = craft.steer(input, timestamp);
+				FlyingObject projectile = ((Craft) fo).steer(input, timestamp);
 
 				if (projectile != null) {
 					toBeAdded.add(projectile);
@@ -179,11 +169,16 @@ public class Gravity extends Application {
 
 			fo.show(gx, timestamp);
 
-			if (fo instanceof Shot) {
-				if (((Shot) fo).isToBeDespawned()) {
-					toBeRemoved.add(fo);
-				}
+			if (fo.isToBeDespawned())
+			{
+				toBeRemoved.add(fo);
 			}
+			
+//			if (fo instanceof Shot) {
+//				if (((Shot) fo).isToBeDespawned()) {
+//					toBeRemoved.add(fo);
+//				}
+//			}
 		}
 
 		flyingObjects.removeAll(toBeRemoved);
@@ -193,7 +188,7 @@ public class Gravity extends Application {
 		// canvas.setWidth(((BorderPane) canvas.getParent()).getWidth());
 	}
 
-	private void checkCollisions(double maxX, double maxY) {
+	private void checkCollisions(long timestamp, double maxX, double maxY) {
 
 		for (ListIterator<FlyingObject> slowIt = flyingObjects.listIterator(); slowIt.hasNext();) {
 			FlyingObject fo1 = slowIt.next();
@@ -201,13 +196,19 @@ public class Gravity extends Application {
 			// check wall collisions:
 			double xVel = fo1.getXVelocity();
 			double yVel = fo1.getYVelocity();
-			if ((fo1.getCenterX() - fo1.getRadius() <= 0 && xVel < 0)
-					|| (fo1.getCenterX() + fo1.getRadius() >= maxX && xVel > 0)) {
-				fo1.setXVelocity(-xVel * BOUNCE_MODERATION);
-			}
-			if ((fo1.getCenterY() - fo1.getRadius() <= 0 && yVel < 0)
-					|| (fo1.getCenterY() + fo1.getRadius() >= maxY && yVel > 0)) {
-				fo1.setYVelocity(-yVel * BOUNCE_MODERATION);
+
+			if (fo1 instanceof Craft) {
+
+				if ((fo1.getCenterX() - fo1.getRadius() <= 0 && xVel < 0)
+						|| (fo1.getCenterX() + fo1.getRadius() >= maxX && xVel > 0)) {
+					fo1.setXVelocity(-xVel * BOUNCE_MODERATION);
+					Gravity.playSound("wall");
+				}
+				if ((fo1.getCenterY() - fo1.getRadius() <= 0 && yVel < 0)
+						|| (fo1.getCenterY() + fo1.getRadius() >= maxY && yVel > 0)) {
+					fo1.setYVelocity(-yVel * BOUNCE_MODERATION);
+					Gravity.playSound("wall");
+				}
 			}
 
 			for (ListIterator<FlyingObject> fastIt = flyingObjects.listIterator(slowIt.nextIndex()); fastIt
@@ -220,6 +221,27 @@ public class Gravity extends Application {
 
 				if (colliding(fo1, fo2, deltaX, deltaY)) {
 					bounce(fo1, fo2, deltaX, deltaY);
+					if (fo1 instanceof Craft) {
+						if (fo2 instanceof Shot) {
+							((Craft) fo1).damage(timestamp, 5);
+							if (((Craft) fo1).isShieldUp() == false) {
+								((Shot) fo2).despawn();
+								//Gravity.playSound("hitcraft" + new Random().nextInt(2));
+								Gravity.playSound("hitcraft");
+							}
+							else
+							{
+								//Gravity.playSound("hitshield" + new Random().nextInt(2));
+								Gravity.playSound("hitshield");
+							}
+
+						} else {
+							Gravity.playSound("crash");
+							((Craft)fo1).damage(timestamp, 3);
+							((Craft)fo2).damage(timestamp, 3);
+						}
+
+					}
 				}
 			}
 
@@ -229,7 +251,9 @@ public class Gravity extends Application {
 				final double deltaX = fo1.getCenterX() - so.getCenterX();
 				final double deltaY = fo1.getCenterY() - so.getCenterY();
 				if (deltaX * deltaX + deltaY * deltaY <= radiusSum * radiusSum) {
-					// what to do on sun collisions?
+					if (fo1 instanceof Craft) {
+						// Gravity.sound.playSound("fire");
+					}
 				}
 
 			}
@@ -289,31 +313,42 @@ public class Gravity extends Application {
 
 	}
 
+	public static void playSound(String sound) {
+		Gravity.sound.playSound(sound);
+	}
+
 	private void createWorld(long timestamp) {
 		worldCreated = true;
 		// flyingObjects.add(new FlyingObject(300, 300, 20, 10, 1, 0));
-		flyingObjects.add(new Craft(500, 200, 20, 10, 1, 10, "LEFT", "RIGHT", "UP", "INSERT"));
-		// flyingObjects.add(new Craft(100, 500, 20, 1, 1, 10, "H", "K", "U"));
-		flyingObjects.add(new Craft(500, 100, 20, 10, 1, 60, "A", "D", "W", "SPACE"));
+		Craft craft1 = new Craft(500, 200, 20, 10, 1, 10, "LEFT", "RIGHT", "UP", "DOWN", "INSERT", 100, 5);
+		Craft craft2 = new Craft(500, 500, 20, 10, 1, 60, "A", "D", "W", "S", "SPACE", 100, 20);
+		flyingObjects.add(craft1);
+		flyingObjects.add(craft2);
+		HealthBar bar1 = new HealthBar(craft1, 10, 5);
+		HealthBar bar2 = new HealthBar(craft2, 1400, 5);
+		healthBars.add(bar1);
+		healthBars.add(bar2);
 		// flyingObjects.add(new Shot(550, 200, 60, 0, timestamp));
-		// sols.add(new Sol(1000, 500, 60, 20000));
-		sols.add(new Sol(800, 500, 30, 10000));
+		sols.add(new Sol(1000, 500, 60, 2000));
+		sols.add(new Sol(800, 500, 50, 2000));
 	}
 
-	private void applyOnResizeListener(final Scene scene, final Canvas canvas, final Pane pane) {
-
-		ChangeListener cl = new ChangeListener<Number>() {
-			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				pane.setPrefWidth(scene.getWidth());
-				pane.setPrefHeight(scene.getHeight());
-				canvas.setWidth(pane.getWidth());
-				canvas.setHeight(pane.getHeight());
-			}
-		};
-		
-		scene.widthProperty().addListener(cl);
-		scene.heightProperty().addListener(cl);
-	}
+	// private void applyOnResizeListener(final Scene scene, final Canvas canvas,
+	// final Pane pane) {
+	//
+	// ChangeListener cl = new ChangeListener<Number>() {
+	// public void changed(ObservableValue<? extends Number> observable, Number
+	// oldValue, Number newValue) {
+	// pane.setPrefWidth(scene.getWidth());
+	// pane.setPrefHeight(scene.getHeight());
+	// canvas.setWidth(pane.getWidth());
+	// canvas.setHeight(pane.getHeight());
+	// }
+	// };
+	//
+	// scene.widthProperty().addListener(cl);
+	// scene.heightProperty().addListener(cl);
+	// }
 
 	private static class FrameStats {
 		private long frameCount;
