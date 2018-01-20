@@ -19,7 +19,7 @@ public class GravityObject {
 	    view.setRadius(radius);
 	 }
 
-	public void show(GraphicsContext gc, long timestamp) {
+	public void show(GraphicsContext gc, long timestamp, long elapsedTime) {
 		 gc.setStroke(Color.RED);
 		 gc.strokeLine(getCenterX()-5, getCenterY()-5, getCenterX()+5, getCenterY()+5);
 		 gc.strokeLine(getCenterX()-5, getCenterY()+5, getCenterX()+5, getCenterY()-5);

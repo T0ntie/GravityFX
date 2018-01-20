@@ -7,13 +7,20 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 
 public class Craft extends FlyingObject {
 
-	final static Image craftImg = new Image("craft.png");
+	final Image[] craftImgA = { new Image("craftred.png"), new Image("craftblue.png") };
+	final Image[] shieldImgA = { new Image("shieldred.png"), new Image("shieldblue.png") };
+
+	final Image craftImg;
+	final Image shieldImg;
+
+	final static int MAX_PLAYERS_DEFINED = 1;
+
 	final static Image thrustImg = new Image("thrust.png");
-	final static Image shieldImg = new Image("shield.png");
 	final static Image[] explosionImg = new Image[20];
 	static {
 		for (int i = 0; i < 20; i++) {
@@ -21,15 +28,19 @@ public class Craft extends FlyingObject {
 		}
 	}
 
+	final Color[] color = { Color.DARKRED, Color.ROYALBLUE };
+
 	final static Random random = new Random();
 	long explosion = 0;
 	int showthrust = 0;
-	boolean shieldIsUp = false;
+	long shieldIsUp = 0;
+	int player = 0;
 
 	double craftRadius;
 	double shieldRadius = 50;
 
 	private DoubleProperty health = new SimpleDoubleProperty(50.0);
+	private DoubleProperty shieldPower = new SimpleDoubleProperty(50.0);
 
 	private String keyLeft;
 	private String keyRight;
@@ -39,7 +50,7 @@ public class Craft extends FlyingObject {
 
 	public Craft(double centerX, double centerY, double radius, double xVelocity, double yVelocity, double mass,
 			String keyLeft, String keyRight, String keyForward, String keyShield, String keyFire, double healthbarX,
-			double healthbarY) {
+			double healthbarY, int player) {
 		super(centerX, centerY, radius, xVelocity, yVelocity, mass);
 
 		this.keyLeft = keyLeft;
@@ -48,15 +59,26 @@ public class Craft extends FlyingObject {
 		this.keyShield = keyShield;
 		this.keyFire = keyFire;
 		this.craftRadius = radius;
+		this.player = Math.min(player, MAX_PLAYERS_DEFINED);
+		this.craftImg = craftImgA[player];
+		this.shieldImg = shieldImgA[player];
 	}
 
 	public DoubleProperty getHealthProperty() {
 		return health;
 	}
 
+	public DoubleProperty getShieldPowerProperty() {
+		return shieldPower;
+	}
+
+	public Color getColor() {
+		return color[this.player];
+	}
+
 	// Explosion explosion = null;
 
-	public void show(GraphicsContext gc, long timestamp) {
+	public void show(GraphicsContext gc, long timestamp, long elapsedTime) {
 
 		// if (explosion != null) {
 		// explosion.show(gc, timestamp, getCenterX(), getCenterY());
@@ -85,7 +107,9 @@ public class Craft extends FlyingObject {
 					getCenterY() + craftImg.getHeight());
 		}
 		gc.restore();
-		if (shieldIsUp) {
+		if (shieldIsUp > 0) {
+			double secondsShieldUp = (timestamp - this.shieldIsUp) / 1_000_000_000.0;
+			shieldPower.set(this.shieldPower.doubleValue() - secondsShieldUp/10);
 			gc.save();
 			a = new Affine();
 			a.appendRotation(orientation, getCenterX(), getCenterY());
@@ -93,6 +117,10 @@ public class Craft extends FlyingObject {
 			gc.setTransform(a);
 			gc.drawImage(shieldImg, getCenterX(), getCenterY());
 			gc.restore();
+		}
+		else
+		{
+			shieldPower.set(Math.min(this.shieldPower.doubleValue()+ elapsedTime/1_000_000_000.0, 50));
 		}
 	}
 
@@ -105,7 +133,7 @@ public class Craft extends FlyingObject {
 	}
 
 	public void accellerate() {
-		if (!shieldIsUp) {
+		if (shieldIsUp == 0) {
 			this.addVelocity(Math.sin(Math.toRadians(orientation)) * 10, -Math.cos(Math.toRadians(orientation)) * 10);
 			showthrust = 10;
 		}
@@ -116,7 +144,7 @@ public class Craft extends FlyingObject {
 	public FlyingObject fire(long timestamp) {
 		FlyingObject projectile = null;
 
-		if (!shieldIsUp && (timestamp - lastfired) / 1_000_000_000.0 > 0.1) {
+		if ((shieldIsUp == 0) && (timestamp - lastfired) / 1_000_000_000.0 > 0.1) {
 			double x = Math.sin(Math.toRadians(orientation)) * 500;
 			double y = -Math.cos(Math.toRadians(orientation)) * 500;
 			lastfired = timestamp;
@@ -149,16 +177,16 @@ public class Craft extends FlyingObject {
 		}
 
 		if (input.contains(keyShield)) {
-			shieldUp();
+			shieldUp(timestamp);
 		} else {
-			shieldDown();
+			shieldDown(timestamp);
 		}
 
 		return projectile;
 	}
 
 	public void damage(long timestamp, double d) {
-		if (!shieldIsUp) {
+		if (shieldIsUp == 0) {
 			this.health.set(this.health.doubleValue() - d);
 			if (health.doubleValue() <= 0) {
 				this.explosion = timestamp;
@@ -167,17 +195,28 @@ public class Craft extends FlyingObject {
 		}
 	}
 
-	public void shieldUp() {
-		this.shieldIsUp = true;
-		setRadius(shieldRadius);
+	public void shieldUp(long timestamp) {
+		if (shieldPower.doubleValue()>0)
+		{
+			if (shieldIsUp == 0)
+			{
+				this.shieldIsUp = timestamp;
+				setRadius(shieldRadius);
+			}
+		}
+		else
+		{
+			this.shieldIsUp = 0;
+			setRadius(craftRadius);
+		}
 	}
 
-	public void shieldDown() {
-		this.shieldIsUp = false;
+	public void shieldDown(long timestamp) {
+		this.shieldIsUp = 0;
 		setRadius(craftRadius);
 	}
 
 	public boolean isShieldUp() {
-		return this.shieldIsUp;
+		return (this.shieldIsUp > 0);
 	}
 }
