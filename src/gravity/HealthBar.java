@@ -6,20 +6,22 @@ import javafx.scene.paint.Color;
 
 public class HealthBar {
 	
-	private DoubleProperty health;
+	private DoubleProperty value;
+	private Color color;
 	private int posX;
 	private int posY;
 	
-	public HealthBar (Craft craft, int posX, int posY)
+	public HealthBar (DoubleProperty value, Color color, int posX, int posY)
 	{
-		health = craft.getHealthProperty();
+		this.value = value;
+		this.color = color;
 		this.posX = posX;
 		this.posY = posY;
 	}
 
-	public void show(GraphicsContext gc, long timestamp) {
-		gc.setFill(Color.DARKORCHID);
-		gc.fillRoundRect(posX, posY, this.health.doubleValue()*5, 10, 5, 5);
+	public void show(GraphicsContext gc, long timestamp, long elapsedTime) {
+		gc.setFill(color);
+		gc.fillRoundRect(posX, posY, this.value.doubleValue()*5, 10, 5, 5);
 	}
 
 }

@@ -15,7 +15,7 @@ public class Shot extends FlyingObject {
 		this.timeOfBirth = timeOfBirth;
 	}
 
-	public void show(GraphicsContext gc, long timestamp) {
+	public void show(GraphicsContext gc, long timestamp, long elapsedTime) {
 
 		double secondsLiving = (timestamp - timeOfBirth) / 1_000_000_000.0;
 

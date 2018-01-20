@@ -16,7 +16,7 @@ public class Sol extends GravityObject{
         imageSide = 2*radius*RADIUS_RATIO/Math.sqrt(2);
 	}
 	
-	public void show(GraphicsContext gc, long elapsedTime) {
+	public void show(GraphicsContext gc, long timestamp, long elapsedTime) {
 		//gc.strokeOval(getCenterX()-radius, getCenterY()-radius, radius*2, radius*2);
 		gc.drawImage(solImg, getCenterX()-imageSide/2, getCenterY()-imageSide/2, imageSide, imageSide);
 	}

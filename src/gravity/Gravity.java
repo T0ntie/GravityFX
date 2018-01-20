@@ -135,11 +135,11 @@ public class Gravity extends Application {
 		}
 
 		for (Sol so : sols) {
-			so.show(gx, timestamp);
+			so.show(gx, timestamp, elapsedTime);
 		}
 
 		for (HealthBar bar : healthBars) {
-			bar.show(gx, timestamp);
+			bar.show(gx, timestamp, elapsedTime);
 		}
 
 		List<FlyingObject> toBeRemoved = new ArrayList<FlyingObject>();
@@ -167,7 +167,7 @@ public class Gravity extends Application {
 				}
 			}
 
-			fo.show(gx, timestamp);
+			fo.show(gx, timestamp, elapsedTime);
 
 			if (fo.isToBeDespawned())
 			{
@@ -320,17 +320,22 @@ public class Gravity extends Application {
 	private void createWorld(long timestamp) {
 		worldCreated = true;
 		// flyingObjects.add(new FlyingObject(300, 300, 20, 10, 1, 0));
-		Craft craft1 = new Craft(500, 200, 20, 10, 1, 10, "LEFT", "RIGHT", "UP", "DOWN", "INSERT", 100, 5);
-		Craft craft2 = new Craft(500, 500, 20, 10, 1, 60, "A", "D", "W", "S", "SPACE", 100, 20);
+		Craft craft1 = new Craft(500, 200, 20, 10, 1, 40, "LEFT", "RIGHT", "UP", "DOWN", "INSERT", 100, 5, 0);
+		Craft craft2 = new Craft(500, 500, 20, 10, 1, 40, "A", "D", "W", "S", "SPACE", 100, 20, 1);
 		flyingObjects.add(craft1);
 		flyingObjects.add(craft2);
-		HealthBar bar1 = new HealthBar(craft1, 10, 5);
-		HealthBar bar2 = new HealthBar(craft2, 1400, 5);
+		HealthBar bar1 = new HealthBar(craft1.getHealthProperty(),craft1.getColor(), 20, 5);
+		HealthBar bar2 = new HealthBar(craft2.getHealthProperty(), craft2.getColor(),1650, 5);
+		HealthBar sbar1 = new HealthBar(craft1.getShieldPowerProperty(),Color.GREENYELLOW, 20, 25);
+		HealthBar sbar2 = new HealthBar(craft2.getShieldPowerProperty(), Color.GREENYELLOW,1650, 25);
+
 		healthBars.add(bar1);
 		healthBars.add(bar2);
+		healthBars.add(sbar1);
+		healthBars.add(sbar2);
 		// flyingObjects.add(new Shot(550, 200, 60, 0, timestamp));
-		sols.add(new Sol(1000, 500, 60, 2000));
-		sols.add(new Sol(800, 500, 50, 2000));
+		sols.add(new Sol(1000, 500, 60, 20000));
+		//sols.add(new Sol(800, 500, 50, 2000));
 	}
 
 	// private void applyOnResizeListener(final Scene scene, final Canvas canvas,
