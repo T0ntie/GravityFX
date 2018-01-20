@@ -109,7 +109,7 @@ public class Craft extends FlyingObject {
 		gc.restore();
 		if (shieldIsUp > 0) {
 			double secondsShieldUp = (timestamp - this.shieldIsUp) / 1_000_000_000.0;
-			shieldPower.set(this.shieldPower.doubleValue() - secondsShieldUp/5);
+			shieldPower.set(this.shieldPower.doubleValue() - secondsShieldUp / 5);
 			gc.save();
 			a = new Affine();
 			a.appendRotation(orientation, getCenterX(), getCenterY());
@@ -117,10 +117,8 @@ public class Craft extends FlyingObject {
 			gc.setTransform(a);
 			gc.drawImage(shieldImg, getCenterX(), getCenterY());
 			gc.restore();
-		}
-		else
-		{
-			shieldPower.set(Math.min(this.shieldPower.doubleValue()+ elapsedTime/1_000_000_000.0, 50));
+		} else {
+			shieldPower.set(Math.min(this.shieldPower.doubleValue() + elapsedTime / 1_000_000_000.0, 50));
 		}
 	}
 
@@ -132,22 +130,22 @@ public class Craft extends FlyingObject {
 		orientation += speed;
 	}
 
-	public void accellerate() {
+	public void accellerate(long timestamp) {
 		if (shieldIsUp == 0) {
 			this.addVelocity(Math.sin(Math.toRadians(orientation)) * 10, -Math.cos(Math.toRadians(orientation)) * 10);
 			showthrust = 10;
 		}
 	}
 
-	private long lastfired = 0;
+	private long lastFired = 0;
 
 	public FlyingObject fire(long timestamp) {
 		FlyingObject projectile = null;
 
-		if ((shieldIsUp == 0) && (timestamp - lastfired) / 1_000_000_000.0 > 0.1) {
+		if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 0.1) {
 			double x = Math.sin(Math.toRadians(orientation)) * 500;
 			double y = -Math.cos(Math.toRadians(orientation)) * 500;
-			lastfired = timestamp;
+			lastFired = timestamp;
 			projectile = new Shot(getCenterX(), getCenterY(), getXVelocity() + x, getYVelocity() + y, 10, timestamp);
 			addVelocity(-x / 10, -y / 10);
 			Gravity.playSound("shot");
@@ -168,7 +166,7 @@ public class Craft extends FlyingObject {
 		}
 
 		if (input.contains(keyForward)) {
-			accellerate();
+			accellerate(timestamp);
 		}
 
 		if (input.contains(keyFire)) {
@@ -187,30 +185,24 @@ public class Craft extends FlyingObject {
 	public void damage(long timestamp, double d) {
 		if (shieldIsUp == 0) {
 			this.health.set(this.health.doubleValue() - d);
-			if (health.doubleValue() <= 0) {
+			if (health.doubleValue() <= 0 && explosion == 0) {
 				this.explosion = timestamp;
 				this.shieldPower.set(0);
 				Gravity.playSound("explosion");
 			}
-		}else
-		{
-			this.shieldPower.set(shieldPower.doubleValue()-d/2);
+		} else {
+			this.shieldPower.set(shieldPower.doubleValue() - d / 2);
 		}
 	}
 
 	public void shieldUp(long timestamp) {
 
-	
-		if ((shieldIsUp > 0 && shieldPower.doubleValue()>0) || shieldPower.doubleValue() > 5)
-		{
-			if (shieldIsUp == 0)
-			{
+		if ((shieldIsUp > 0 && shieldPower.doubleValue() > 0) || shieldPower.doubleValue() > 5) {
+			if (shieldIsUp == 0) {
 				this.shieldIsUp = timestamp;
 				setRadius(shieldRadius);
 			}
-		}
-		else
-		{
+		} else {
 			this.shieldIsUp = 0;
 			setRadius(craftRadius);
 		}
