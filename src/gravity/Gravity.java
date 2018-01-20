@@ -32,7 +32,7 @@ public class Gravity extends Application {
 
 	public final static double BOUNCE_MODERATION = 0.1;
 
-	public static String STATUS_MSG = "";
+	public static String STATUS_MSG = "GIT-Version";
 
 	private final FrameStats frameStats = new FrameStats();
 	private ObservableList<FlyingObject> flyingObjects = FXCollections.observableArrayList();
@@ -47,7 +47,7 @@ public class Gravity extends Application {
 
 	public void start(Stage primaryStage) throws Exception {
 
-		primaryStage.setTitle("Gravity");
+		primaryStage.setTitle("GIT Gravity");
 		final BorderPane root = new BorderPane();
 		// final Group root = new Group();
 
@@ -61,8 +61,6 @@ public class Gravity extends Application {
 				// only add once... prevent duplicates
 				if (!input.contains(code))
 					input.add(code);
-
-				Gravity.STATUS_MSG = code;
 			}
 		});
 
