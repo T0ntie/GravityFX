@@ -17,11 +17,15 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -61,6 +65,7 @@ public class Gravity extends Application {
 				// only add once... prevent duplicates
 				if (!input.contains(code))
 					input.add(code);
+
 			}
 		});
 
@@ -87,6 +92,8 @@ public class Gravity extends Application {
 		// applyOnResizeListener(theScene, canvas, x);
 
 		startAnimation(canvas);
+
+		root.setTop(createMenus());
 
 		primaryStage.setFullScreenExitHint("");
 		primaryStage.setFullScreen(true);
@@ -136,7 +143,6 @@ public class Gravity extends Application {
 			so.show(gx, timestamp, elapsedTime);
 		}
 
-		
 		for (EnergyBar bar : healthBars) {
 			bar.show(gx, timestamp, elapsedTime);
 		}
@@ -168,16 +174,15 @@ public class Gravity extends Application {
 
 			fo.show(gx, timestamp, elapsedTime);
 
-			if (fo.isToBeDespawned())
-			{
+			if (fo.isToBeDespawned()) {
 				toBeRemoved.add(fo);
 			}
-			
-//			if (fo instanceof Shot) {
-//				if (((Shot) fo).isToBeDespawned()) {
-//					toBeRemoved.add(fo);
-//				}
-//			}
+
+			// if (fo instanceof Shot) {
+			// if (((Shot) fo).isToBeDespawned()) {
+			// toBeRemoved.add(fo);
+			// }
+			// }
 		}
 
 		flyingObjects.removeAll(toBeRemoved);
@@ -225,19 +230,17 @@ public class Gravity extends Application {
 							((Craft) fo1).damage(timestamp, 5);
 							if (((Craft) fo1).isShieldUp() == false) {
 								((Shot) fo2).despawn();
-								//Gravity.playSound("hitcraft" + new Random().nextInt(2));
+								// Gravity.playSound("hitcraft" + new Random().nextInt(2));
 								Gravity.playSound("hitcraft");
-							}
-							else
-							{
-								//Gravity.playSound("hitshield" + new Random().nextInt(2));
+							} else {
+								// Gravity.playSound("hitshield" + new Random().nextInt(2));
 								Gravity.playSound("hitshield");
 							}
 
 						} else {
 							Gravity.playSound("crash");
-							((Craft)fo1).damage(timestamp, 3);
-							((Craft)fo2).damage(timestamp, 3);
+							((Craft) fo1).damage(timestamp, 3);
+							((Craft) fo2).damage(timestamp, 3);
 						}
 
 					}
@@ -323,36 +326,53 @@ public class Gravity extends Application {
 		Craft craft2 = new Craft(500, 500, 20, 10, 1, 40, "A", "D", "W", "S", "SPACE", 100, 20, 1);
 		flyingObjects.add(craft1);
 		flyingObjects.add(craft2);
-		EnergyBar bar1 = new EnergyBar(craft1.getHealthProperty(),craft1.getColor(), 20, 5, 10);
-		EnergyBar bar2 = new EnergyBar(craft2.getHealthProperty(), craft2.getColor(),1650, 5, 10);
-		EnergyBar sbar1 = new EnergyBar(craft1.getShieldPowerProperty(),craft1.getColor().brighter(), 20, 15, 5);
-		EnergyBar sbar2 = new EnergyBar(craft2.getShieldPowerProperty(),craft2.getColor().brighter(),1650, 15, 5);
+		
+		EnergyBar bar1 = new EnergyBar(craft1.getHealthProperty(), craft1.getColor(), 20, 1000, 10);
+		EnergyBar bar2 = new EnergyBar(craft2.getHealthProperty(), craft2.getColor(), 1650, 1000, 10);
+		EnergyBar sbar1 = new EnergyBar(craft1.getShieldPowerProperty(), craft1.getColor().brighter(), 20, 1015, 5);
+		EnergyBar sbar2 = new EnergyBar(craft2.getShieldPowerProperty(), craft2.getColor().brighter(), 1650, 1015, 5);
 
 		healthBars.add(bar1);
 		healthBars.add(bar2);
 		healthBars.add(sbar1);
 		healthBars.add(sbar2);
 		// flyingObjects.add(new Shot(550, 200, 60, 0, timestamp));
-		//sols.add(new Sol(1000, 500, 60, 20000));
-		//sols.add(new Sol(800, 500, 50, 2000));
+		// sols.add(new Sol(1000, 500, 60, 20000));
+		// sols.add(new Sol(800, 500, 50, 2000));
+	}
+	
+	private void restart()
+	{
+		healthBars.clear();
+		flyingObjects.clear();
+		sols.clear();
+		worldCreated = false;
+	}
+	
+	private void quit()
+	{
+		Platform.exit();
 	}
 
-	// private void applyOnResizeListener(final Scene scene, final Canvas canvas,
-	// final Pane pane) {
-	//
-	// ChangeListener cl = new ChangeListener<Number>() {
-	// public void changed(ObservableValue<? extends Number> observable, Number
-	// oldValue, Number newValue) {
-	// pane.setPrefWidth(scene.getWidth());
-	// pane.setPrefHeight(scene.getHeight());
-	// canvas.setWidth(pane.getWidth());
-	// canvas.setHeight(pane.getHeight());
-	// }
-	// };
-	//
-	// scene.widthProperty().addListener(cl);
-	// scene.heightProperty().addListener(cl);
-	// }
+	private MenuBar createMenus() {
+		MenuBar menuBar = new MenuBar();
+		Menu menuGame = new Menu("Game");
+		menuBar.getMenus().addAll(menuGame);
+		MenuItem restart = new MenuItem("Restart");
+		MenuItem quit = new MenuItem("Quit");
+
+		restart.setOnAction(e -> restart());
+		quit.setOnAction(e -> quit());
+		
+//		add.setOnAction(new EventHandler<ActionEvent>() {
+//			public void handle(ActionEvent t) {
+//				restart();
+//			}
+//		});
+
+		menuGame.getItems().addAll(restart, quit);
+		return menuBar;
+	}
 
 	private static class FrameStats {
 		private long frameCount;

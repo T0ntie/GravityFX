@@ -173,7 +173,6 @@ public class Craft extends FlyingObject {
 
 		if (input.contains(keyFire)) {
 			projectile = fire(timestamp);
-			Gravity.STATUS_MSG = "fire!";
 		}
 
 		if (input.contains(keyShield)) {
@@ -190,6 +189,7 @@ public class Craft extends FlyingObject {
 			this.health.set(this.health.doubleValue() - d);
 			if (health.doubleValue() <= 0) {
 				this.explosion = timestamp;
+				this.shieldPower.set(0);
 				Gravity.playSound("explosion");
 			}
 		}else
