@@ -8,11 +8,11 @@ public class EnergyBar {
 	
 	private DoubleProperty value;
 	private Color color;
-	private int posX;
-	private int posY;
-	private int height;
+	private double posX;
+	private double posY;
+	private double height;
 	
-	public EnergyBar (DoubleProperty value, Color color, int posX, int posY, int height)
+	public EnergyBar (DoubleProperty value, Color color, double posX, double posY, double height)
 	{
 		this.value = value;
 		this.color = color;

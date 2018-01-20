@@ -17,11 +17,14 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -30,6 +33,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class Gravity extends Application {
@@ -320,6 +324,8 @@ public class Gravity extends Application {
 	}
 
 	private void createWorld(long timestamp) {
+		
+		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
 		worldCreated = true;
 		// flyingObjects.add(new FlyingObject(300, 300, 20, 10, 1, 0));
 		Craft craft1 = new Craft(500, 200, 20, 10, 1, 40, "LEFT", "RIGHT", "UP", "CLEAR", "INSERT", 100, 5, 0);
@@ -327,10 +333,11 @@ public class Gravity extends Application {
 		flyingObjects.add(craft1);
 		flyingObjects.add(craft2);
 		
-		EnergyBar bar1 = new EnergyBar(craft1.getHealthProperty(), craft1.getColor(), 20, 1000, 10);
-		EnergyBar bar2 = new EnergyBar(craft2.getHealthProperty(), craft2.getColor(), 1650, 1000, 10);
-		EnergyBar sbar1 = new EnergyBar(craft1.getShieldPowerProperty(), craft1.getColor().brighter(), 20, 1015, 5);
-		EnergyBar sbar2 = new EnergyBar(craft2.getShieldPowerProperty(), craft2.getColor().brighter(), 1650, 1015, 5);
+		EnergyBar bar1 = new EnergyBar(craft1.getHealthProperty(), craft1.getColor(), 20, vb.getHeight()-30, 10);
+		//EnergyBar bar2 = new EnergyBar(craft2.getHealthProperty(), craft2.getColor(), 1650, 1000, 10);
+		EnergyBar bar2 = new EnergyBar(craft2.getHealthProperty(), craft2.getColor(), vb.getWidth()-270, vb.getHeight()-30, 10);
+		EnergyBar sbar1 = new EnergyBar(craft1.getShieldPowerProperty(), craft1.getColor().brighter(), 20, vb.getHeight()-15, 5);
+		EnergyBar sbar2 = new EnergyBar(craft2.getShieldPowerProperty(), craft2.getColor().brighter(),  vb.getWidth()-270, vb.getHeight()-15, 5);
 
 		healthBars.add(bar1);
 		healthBars.add(bar2);
@@ -353,24 +360,34 @@ public class Gravity extends Application {
 	{
 		Platform.exit();
 	}
+	
+	private void craftPropsDialog()
+	{
+		Dialog<ButtonType> dialog = new Dialog<>();
+		 dialog.getDialogPane().getButtonTypes().add(new ButtonType("Login", ButtonData.OK_DONE));
+		 dialog.showAndWait()
+	      .filter(response -> response == ButtonType.OK)
+	      .ifPresent(response -> System.out.println("Wow"));
+	}
 
 	private MenuBar createMenus() {
 		MenuBar menuBar = new MenuBar();
 		Menu menuGame = new Menu("Game");
-		menuBar.getMenus().addAll(menuGame);
 		MenuItem restart = new MenuItem("Restart");
 		MenuItem quit = new MenuItem("Quit");
 
 		restart.setOnAction(e -> restart());
 		quit.setOnAction(e -> quit());
-		
-//		add.setOnAction(new EventHandler<ActionEvent>() {
-//			public void handle(ActionEvent t) {
-//				restart();
-//			}
-//		});
 
 		menuGame.getItems().addAll(restart, quit);
+
+		Menu menuCraft = new Menu("Spacecraft");
+		MenuItem props = new MenuItem("Properties");
+		props.setOnAction(e -> craftPropsDialog());
+		
+		menuCraft.getItems().addAll(props);
+
+		menuBar.getMenus().addAll(menuGame, menuCraft);
 		return menuBar;
 	}
 
