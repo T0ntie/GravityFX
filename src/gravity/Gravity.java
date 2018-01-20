@@ -37,7 +37,7 @@ public class Gravity extends Application {
 	private final FrameStats frameStats = new FrameStats();
 	private ObservableList<FlyingObject> flyingObjects = FXCollections.observableArrayList();
 	private ObservableList<Sol> sols = FXCollections.observableArrayList();
-	private ObservableList<HealthBar> healthBars = FXCollections.observableArrayList();
+	private ObservableList<EnergyBar> healthBars = FXCollections.observableArrayList();
 
 	private final static Sound sound = new Sound(2);
 
@@ -138,7 +138,8 @@ public class Gravity extends Application {
 			so.show(gx, timestamp, elapsedTime);
 		}
 
-		for (HealthBar bar : healthBars) {
+		
+		for (EnergyBar bar : healthBars) {
 			bar.show(gx, timestamp, elapsedTime);
 		}
 
@@ -320,21 +321,21 @@ public class Gravity extends Application {
 	private void createWorld(long timestamp) {
 		worldCreated = true;
 		// flyingObjects.add(new FlyingObject(300, 300, 20, 10, 1, 0));
-		Craft craft1 = new Craft(500, 200, 20, 10, 1, 40, "LEFT", "RIGHT", "UP", "DOWN", "INSERT", 100, 5, 0);
+		Craft craft1 = new Craft(500, 200, 20, 10, 1, 40, "LEFT", "RIGHT", "UP", "CLEAR", "INSERT", 100, 5, 0);
 		Craft craft2 = new Craft(500, 500, 20, 10, 1, 40, "A", "D", "W", "S", "SPACE", 100, 20, 1);
 		flyingObjects.add(craft1);
 		flyingObjects.add(craft2);
-		HealthBar bar1 = new HealthBar(craft1.getHealthProperty(),craft1.getColor(), 20, 5);
-		HealthBar bar2 = new HealthBar(craft2.getHealthProperty(), craft2.getColor(),1650, 5);
-		HealthBar sbar1 = new HealthBar(craft1.getShieldPowerProperty(),Color.GREENYELLOW, 20, 25);
-		HealthBar sbar2 = new HealthBar(craft2.getShieldPowerProperty(), Color.GREENYELLOW,1650, 25);
+		EnergyBar bar1 = new EnergyBar(craft1.getHealthProperty(),craft1.getColor(), 20, 5, 10);
+		EnergyBar bar2 = new EnergyBar(craft2.getHealthProperty(), craft2.getColor(),1650, 5, 10);
+		EnergyBar sbar1 = new EnergyBar(craft1.getShieldPowerProperty(),craft1.getColor().brighter(), 20, 15, 5);
+		EnergyBar sbar2 = new EnergyBar(craft2.getShieldPowerProperty(),craft2.getColor().brighter(),1650, 15, 5);
 
 		healthBars.add(bar1);
 		healthBars.add(bar2);
 		healthBars.add(sbar1);
 		healthBars.add(sbar2);
 		// flyingObjects.add(new Shot(550, 200, 60, 0, timestamp));
-		sols.add(new Sol(1000, 500, 60, 20000));
+		//sols.add(new Sol(1000, 500, 60, 20000));
 		//sols.add(new Sol(800, 500, 50, 2000));
 	}
 

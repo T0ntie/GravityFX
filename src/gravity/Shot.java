@@ -7,7 +7,6 @@ public class Shot extends FlyingObject {
 
 	private final long timeOfBirth;
 	public final static double SECONDS_TO_LIVE = 5.0;
-	//public final static double MASS = 50;
 
 	public Shot(double centerX, double centerY, double xVelocity, double yVelocity, double mass, long timeOfBirth) {
 
