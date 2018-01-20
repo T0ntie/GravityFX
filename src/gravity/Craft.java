@@ -109,7 +109,7 @@ public class Craft extends FlyingObject {
 		gc.restore();
 		if (shieldIsUp > 0) {
 			double secondsShieldUp = (timestamp - this.shieldIsUp) / 1_000_000_000.0;
-			shieldPower.set(this.shieldPower.doubleValue() - secondsShieldUp/10);
+			shieldPower.set(this.shieldPower.doubleValue() - secondsShieldUp/5);
 			gc.save();
 			a = new Affine();
 			a.appendRotation(orientation, getCenterX(), getCenterY());
@@ -192,11 +192,16 @@ public class Craft extends FlyingObject {
 				this.explosion = timestamp;
 				Gravity.playSound("explosion");
 			}
+		}else
+		{
+			this.shieldPower.set(shieldPower.doubleValue()-d/2);
 		}
 	}
 
 	public void shieldUp(long timestamp) {
-		if (shieldPower.doubleValue()>0)
+
+	
+		if ((shieldIsUp > 0 && shieldPower.doubleValue()>0) || shieldPower.doubleValue() > 5)
 		{
 			if (shieldIsUp == 0)
 			{
