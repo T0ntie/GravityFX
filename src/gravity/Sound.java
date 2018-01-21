@@ -35,6 +35,8 @@ public class Sound {
 		loadSoundEffect("shot", "shot2.mp3");
 		loadSoundEffect("hitshield", "hitshield0.mp3");
 		loadSoundEffect("hitshield", "hitshield1.mp3");
+		loadSoundEffect("hitshield", "hitshield2.mp3");
+		loadSoundEffect("hitshield", "hitshield3.mp3");
 		loadSoundEffect("hitcraft", "hitcraft0.mp3");
 		loadSoundEffect("hitcraft", "hitcraft1.mp3");
 		loadSoundEffect("crash", "crash.mp3");

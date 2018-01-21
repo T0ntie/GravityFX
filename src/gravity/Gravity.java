@@ -218,16 +218,26 @@ public class Gravity extends Application {
 			double yVel = fo1.getYVelocity();
 
 			if (fo1 instanceof Craft) {
+				Craft craft1 = (Craft) fo1;
+				boolean wallHit = false;
 
-				if ((fo1.getCenterX() - fo1.getRadius() <= 0 && xVel < 0)
-						|| (fo1.getCenterX() + fo1.getRadius() >= maxX && xVel > 0)) {
-					fo1.setXVelocity(-xVel * BOUNCE_MODERATION);
-					Gravity.playSound("wall");
+				if ((craft1.getCenterX() - craft1.getRadius() <= 0 && xVel < 0)
+						|| (craft1.getCenterX() + craft1.getRadius() >= maxX && xVel > 0)) {
+					craft1.setXVelocity(-xVel * BOUNCE_MODERATION);
+					wallHit = true;
 				}
-				if ((fo1.getCenterY() - fo1.getRadius() <= 0 && yVel < 0)
-						|| (fo1.getCenterY() + fo1.getRadius() >= maxY && yVel > 0)) {
-					fo1.setYVelocity(-yVel * BOUNCE_MODERATION);
-					Gravity.playSound("wall");
+				if ((craft1.getCenterY() - craft1.getRadius() <= 0 && yVel < 0)
+						|| (craft1.getCenterY() + craft1.getRadius() >= maxY && yVel > 0)) {
+					craft1.setYVelocity(-yVel * BOUNCE_MODERATION);
+					wallHit = true;
+				}
+				if (wallHit) {
+					if (craft1.isShieldUp()) {
+						Gravity.playSound("hitshield");
+					} else {
+						craft1.damage(timestamp, 0.05);
+						Gravity.playSound("wall");
+					}
 				}
 			}
 
@@ -246,17 +256,15 @@ public class Gravity extends Application {
 							((Craft) fo1).damage(timestamp, 5);
 							if (((Craft) fo1).isShieldUp() == false) {
 								((Shot) fo2).despawn();
-								// Gravity.playSound("hitcraft" + new Random().nextInt(2));
 								Gravity.playSound("hitcraft");
 							} else {
-								// Gravity.playSound("hitshield" + new Random().nextInt(2));
 								Gravity.playSound("hitshield");
 							}
 
 						} else {
 							Gravity.playSound("crash");
-							((Craft) fo1).damage(timestamp, 3);
-							((Craft) fo2).damage(timestamp, 3);
+							((Craft) fo1).damage(timestamp, 1);
+							((Craft) fo2).damage(timestamp, 1);
 						}
 
 					}
@@ -460,18 +468,16 @@ public class Gravity extends Application {
 		menuGame.getItems().addAll(restart, quit);
 
 		Menu menuScenario = new Menu("Scenario");
-		
-		//final ToggleGroup scenarioGroup = new ToggleGroup();
 
+		// final ToggleGroup scenarioGroup = new ToggleGroup();
 
 		ToggleGroup radioGroup = new ToggleGroup();
 
 		RadioMenuItem miSdf = new RadioMenuItem(SCENARIO_DOGFIGHT);
 		miSdf.setSelected(true);
 		miSdf.setToggleGroup(radioGroup);
-		
+
 		miSdf.setOnAction(e -> setScenario(SCENARIO_DOGFIGHT));
-		
 
 		RadioMenuItem miScs = new RadioMenuItem(SCENARIO_CENTRAL_SUN);
 		miScs.setOnAction(e -> setScenario(SCENARIO_CENTRAL_SUN));
@@ -480,7 +486,7 @@ public class Gravity extends Application {
 		RadioMenuItem miSts = new RadioMenuItem(SCENARIO_TWO_SUNS);
 		miSts.setOnAction(e -> setScenario(SCENARIO_TWO_SUNS));
 		miSts.setToggleGroup(radioGroup);
-		
+
 		menuScenario.getItems().addAll(miSdf, miScs, miSts);
 
 		menuBar.getMenus().addAll(menuGame, menuScenario);
