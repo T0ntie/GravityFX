@@ -147,7 +147,7 @@ public class Craft extends FlyingObject {
 			double y = -Math.cos(Math.toRadians(orientation)) * 500;
 			lastFired = timestamp;
 			projectile = new Shot(getCenterX(), getCenterY(), getXVelocity() + x, getYVelocity() + y, 10, timestamp);
-			addVelocity(-x / 10, -y / 10);
+			addVelocity(-x / 20, -y / 20);
 			Gravity.playSound("shot");
 		}
 		return projectile;
