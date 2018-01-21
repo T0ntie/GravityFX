@@ -270,7 +270,8 @@ public class Gravity extends Application {
 				final double deltaY = fo1.getCenterY() - so.getCenterY();
 				if (deltaX * deltaX + deltaY * deltaY <= radiusSum * radiusSum) {
 					if (fo1 instanceof Craft) {
-						// Gravity.sound.playSound("fire");
+						((Craft) fo1).damage(timestamp, 0.1);
+						Gravity.sound.playSound("hiss");
 					}
 				}
 
