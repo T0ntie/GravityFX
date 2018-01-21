@@ -30,7 +30,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -43,6 +45,8 @@ public class Gravity extends Application {
 
 	public final static String SCENARIO_CENTRAL_SUN = "Central Sun";
 	public final static String SCENARIO_DOGFIGHT = "Dogfight";
+	public final static String SCENARIO_TWO_SUNS = "Two Suns";
+
 	public String scenario = SCENARIO_DOGFIGHT;
 
 	public final static double BOUNCE_MODERATION = 0.1;
@@ -143,6 +147,7 @@ public class Gravity extends Application {
 		double elapsedSeconds = elapsedTime / 1_000_000_000.0;
 
 		GraphicsContext gx = canvas.getGraphicsContext2D();
+
 		gx.setFill(Color.BLACK);
 		gx.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
@@ -331,26 +336,31 @@ public class Gravity extends Application {
 	}
 
 	private void createWorld(long timestamp) {
-		
-		switch(this.scenario)
-		{
+
+		switch (this.scenario) {
 		case SCENARIO_DOGFIGHT:
 			createDogfightScenario(timestamp);
 			break;
 		case SCENARIO_CENTRAL_SUN:
 			createCentralSunScenario(timestamp);
 			break;
-			
+
+		case SCENARIO_TWO_SUNS:
+			createTwoSunsScenario(timestamp);
+			break;
+
 		}
-		worldCreated=true;
+		worldCreated = true;
 	}
 
 	private void createDogfightScenario(long timestamp) {
 
 		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
 
-		Craft craft1 = new Craft(500, vb.getHeight()/2, 20, 10, -200, 40, "LEFT", "RIGHT", "UP", "CLEAR", "INSERT", 100, 5, 0);
-		Craft craft2 = new Craft(vb.getWidth()-500, vb.getHeight()/2, 20, -10, 200, 40, "A", "D", "W", "S", "SPACE", 100, 20, 1);
+		Craft craft1 = new Craft(500, vb.getHeight() / 2, 20, 10, -200, 40, "LEFT", "RIGHT", "UP", "CLEAR", "INSERT",
+				100, 5, 0);
+		Craft craft2 = new Craft(vb.getWidth() - 500, vb.getHeight() / 2, 20, -10, 200, 40, "A", "D", "W", "S", "SPACE",
+				100, 20, 1);
 		flyingObjects.add(craft1);
 		flyingObjects.add(craft2);
 
@@ -368,9 +378,15 @@ public class Gravity extends Application {
 	private void createCentralSunScenario(long timestamp) {
 		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
 		createDogfightScenario(timestamp);
-		double radius = 60;
+		sols.add(new Sol((vb.getWidth() / 2), (vb.getHeight() / 2), 60, 20000));
+	}
 
-		sols.add(new Sol((vb.getWidth() / 2), (vb.getHeight() / 2), radius, 20000));
+	private void createTwoSunsScenario(long timestamp) {
+		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
+		createDogfightScenario(timestamp);
+
+		sols.add(new Sol((vb.getWidth() / 3), (vb.getHeight() / 3), 50, 10000));
+		sols.add(new Sol((vb.getWidth() * 2 / 3), (vb.getHeight() * 2 / 3), 50, 10000));
 	}
 
 	private void restart() {
@@ -443,15 +459,28 @@ public class Gravity extends Application {
 		menuGame.getItems().addAll(restart, quit);
 
 		Menu menuScenario = new Menu("Scenario");
-
-		MenuItem miSdf = new MenuItem(SCENARIO_DOGFIGHT);
-		miSdf.setOnAction(e -> setScenario(SCENARIO_DOGFIGHT));
-
-		MenuItem miScs = new MenuItem(SCENARIO_CENTRAL_SUN);
-		miScs.setOnAction(e -> setScenario(SCENARIO_CENTRAL_SUN));
-
 		
-		menuScenario.getItems().addAll(miSdf, miScs);
+		//final ToggleGroup scenarioGroup = new ToggleGroup();
+
+
+		ToggleGroup radioGroup = new ToggleGroup();
+
+		RadioMenuItem miSdf = new RadioMenuItem(SCENARIO_DOGFIGHT);
+		miSdf.setSelected(true);
+		miSdf.setToggleGroup(radioGroup);
+		
+		miSdf.setOnAction(e -> setScenario(SCENARIO_DOGFIGHT));
+		
+
+		RadioMenuItem miScs = new RadioMenuItem(SCENARIO_CENTRAL_SUN);
+		miScs.setOnAction(e -> setScenario(SCENARIO_CENTRAL_SUN));
+		miScs.setToggleGroup(radioGroup);
+
+		RadioMenuItem miSts = new RadioMenuItem(SCENARIO_TWO_SUNS);
+		miSts.setOnAction(e -> setScenario(SCENARIO_TWO_SUNS));
+		miSts.setToggleGroup(radioGroup);
+		
+		menuScenario.getItems().addAll(miSdf, miScs, miSts);
 
 		menuBar.getMenus().addAll(menuGame, menuScenario);
 		return menuBar;
