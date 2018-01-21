@@ -11,6 +11,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 
 public class Craft extends FlyingObject {
+	
+	//shots per second
+	public static double fireRate = 10;
+	
+	//speed pixel per second
+	public static double firePower = 500;
+	
+	//mass of projectile
+	public static double fireImpact = 10;
 
 	final Image[] craftImgA = { new Image("craftred.png"), new Image("craftblue.png") };
 	final Image[] shieldImgA = { new Image("shieldred.png"), new Image("shieldblue.png") };
@@ -142,11 +151,12 @@ public class Craft extends FlyingObject {
 	public FlyingObject fire(long timestamp) {
 		FlyingObject projectile = null;
 
-		if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 0.1) {
-			double x = Math.sin(Math.toRadians(orientation)) * 500;
-			double y = -Math.cos(Math.toRadians(orientation)) * 500;
+		//if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 0.1) {
+		if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 1 / fireRate ) {
+			double x = Math.sin(Math.toRadians(orientation)) * firePower;
+			double y = -Math.cos(Math.toRadians(orientation)) * firePower;
 			lastFired = timestamp;
-			projectile = new Shot(getCenterX(), getCenterY(), getXVelocity() + x, getYVelocity() + y, 10, timestamp);
+			projectile = new Shot(getCenterX(), getCenterY(), getXVelocity() + x, getYVelocity() + y, fireImpact, timestamp);
 			addVelocity(-x / 20, -y / 20);
 			Gravity.playSound("shot");
 		}

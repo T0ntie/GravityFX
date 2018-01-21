@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
 
-import gravity.props.SceneProps;
+import gravity.props.CraftProps;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -31,7 +31,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -414,30 +414,63 @@ public class Gravity extends Application {
 		restart();
 	}
 
-	private void sceneDialog(Stage owner) {
+	private void craftDialog(Stage owner) {
 
-		Dialog<SceneProps> dialog = new Dialog<>();
+		Dialog<CraftProps> dialog = new Dialog<>();
 
 		dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-		TextField sonne = new TextField();
-		sonne.setPromptText("Sonne:");
+		Slider slFr = new Slider();
+		slFr.setMin(0);
+		slFr.setMax(30);
+		slFr.setValue(Craft.fireRate);
+		slFr.setShowTickLabels(true);
+		slFr.setShowTickMarks(true);
+		slFr.setMajorTickUnit(10);
+		slFr.setMinorTickCount(1);
+		slFr.setBlockIncrement(5);
+
+		Slider slFp = new Slider();
+		slFp.setMin(0);
+		slFp.setMax(1500);
+		slFp.setValue(Craft.firePower);
+		slFp.setShowTickLabels(true);
+		slFp.setShowTickMarks(true);
+		slFp.setMajorTickUnit(500);
+		slFp.setMinorTickCount(200);
+		slFp.setBlockIncrement(500);
+
+		Slider slFi = new Slider();
+		slFi.setMin(0);
+		slFi.setMax(100);
+		slFi.setValue(Craft.fireImpact);
+		slFi.setShowTickLabels(true);
+		slFi.setShowTickMarks(true);
+		slFi.setMajorTickUnit(10);
+		slFi.setMinorTickCount(5);
+		slFi.setBlockIncrement(10);
+
+		
 		VBox vb = new VBox();
 
-		vb.getChildren().addAll(new Label("Sonne"), sonne);
+		vb.getChildren().addAll(new Label("Shots per second"), slFr, new Label("velocity of projectile"), slFp, new Label("mass of projectile"), slFi);
 
 		dialog.getDialogPane().setContent(vb);
 
 		dialog.setResultConverter(dialogButton -> {
 			if (dialogButton == ButtonType.OK) {
-				return new SceneProps(sonne.getText(), "Windig");
+				return new CraftProps(slFr.getValue(), slFp.getValue(), slFi.getValue());
 			}
 			return null;
 		});
 
 		dialog.initOwner(owner);
-		Optional<SceneProps> result = dialog.showAndWait();
-		result.ifPresent(props -> System.out.println("Sonne: " + props.getSonne()));
+		Optional<CraftProps> result = dialog.showAndWait();
+		result.ifPresent(props -> {
+			Craft.fireRate = props.getFireRate();
+			Craft.firePower = props.getFirePower();
+			Craft.fireImpact = props.getFireImpact();
+		});
 
 		// TextInputDialog dialog = new TextInputDialog("walter");
 		// dialog.setTitle("Text Input Dialog");
@@ -469,8 +502,6 @@ public class Gravity extends Application {
 
 		Menu menuScenario = new Menu("Scenario");
 
-		// final ToggleGroup scenarioGroup = new ToggleGroup();
-
 		ToggleGroup radioGroup = new ToggleGroup();
 
 		RadioMenuItem miSdf = new RadioMenuItem(SCENARIO_DOGFIGHT);
@@ -489,7 +520,13 @@ public class Gravity extends Application {
 
 		menuScenario.getItems().addAll(miSdf, miScs, miSts);
 
-		menuBar.getMenus().addAll(menuGame, menuScenario);
+		Menu menuProps = new Menu("Properties");
+
+		MenuItem craftProps = new MenuItem("Craft");
+		craftProps.setOnAction(e -> craftDialog(stage));
+		menuProps.getItems().addAll(craftProps);
+
+		menuBar.getMenus().addAll(menuGame, menuScenario, menuProps);
 		return menuBar;
 	}
 
