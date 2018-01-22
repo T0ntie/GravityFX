@@ -13,21 +13,11 @@ import javafx.scene.transform.Affine;
 
 public class Craft extends FlyingObject {
 	
-//	//shots per second
-//	public static double fireRate = 10;
-//	
-//	//speed pixel per second
-//	public static double firePower = 500;
-//	
-//	//mass of projectile
-//	public static double fireImpact = 10;
-	
 	public final CraftProps properties;
 	
 	final Image[] craftImgA = { new Image("craftred.png"), new Image("craftblue.png") };
 	final Image[] shieldImgA = { new Image("shieldred.png"), new Image("shieldblue.png") };
 
-	//final Image craftImg;
 	final Image shieldImg;
 
 	final static int MAX_PLAYERS_DEFINED = 1;
@@ -54,22 +44,16 @@ public class Craft extends FlyingObject {
 	private DoubleProperty health = new SimpleDoubleProperty(50.0);
 	private DoubleProperty shieldPower = new SimpleDoubleProperty(50.0);
 
-	private String keyLeft;
-	private String keyRight;
-	private String keyForward;
-	private String keyFire;
-	private String keyShield;
-
 	public Craft(double centerX, double centerY, double radius, double xVelocity, double yVelocity, double mass,
-			String keyLeft, String keyRight, String keyForward, String keyShield, String keyFire, double healthbarX,
+			String keyLeft, String keyRight, String keyThrust, String keyShield, String keyFire, double healthbarX,
 			double healthbarY, int player) {
 		super(centerX, centerY, radius, xVelocity, yVelocity, mass);
 		this.properties = new CraftProps();
-		this.keyLeft = keyLeft;
-		this.keyRight = keyRight;
-		this.keyForward = keyForward;
-		this.keyShield = keyShield;
-		this.keyFire = keyFire;
+		this.properties.setKeyThrust(keyThrust);
+		this.properties.setKeyLeft(keyLeft);
+		this.properties.setKeyRight(keyRight);
+		this.properties.setKeyFire(keyFire);
+		this.properties.setKeyShield(keyShield);
 		this.craftRadius = radius;
 		this.player = Math.min(player, MAX_PLAYERS_DEFINED);
 		//this.craftImg = craftImgA[player];
@@ -176,23 +160,23 @@ public class Craft extends FlyingObject {
 
 		FlyingObject projectile = null;
 
-		if (input.contains(keyLeft)) {
+		if (input.contains(properties.getKeyLeft())) {
 			rotateLeft(5);
 		}
 
-		if (input.contains(keyRight)) {
+		if (input.contains(properties.getKeyRight())) {
 			rotateRight(5);
 		}
 
-		if (input.contains(keyForward)) {
+		if (input.contains(properties.getKeyThurst())) {
 			accellerate(timestamp);
 		}
 
-		if (input.contains(keyFire)) {
+		if (input.contains(properties.getKeyFire())) {
 			projectile = fire(timestamp);
 		}
 
-		if (input.contains(keyShield)) {
+		if (input.contains(properties.getKeyShield())) {
 			shieldUp(timestamp);
 		} else {
 			shieldDown(timestamp);

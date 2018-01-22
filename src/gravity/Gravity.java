@@ -375,8 +375,6 @@ public class Gravity extends Application {
 		flyingObjects.addAll(craft1, craft2);
 		crafts.addAll(craft1, craft2);
 		
-		System.out.println("crafts add3d" );
-
 		EnergyBar bar1 = new EnergyBar(craft1.getHealthProperty(), craft1.getColor(), 20, vb.getHeight() - 30, 10);
 		EnergyBar bar2 = new EnergyBar(craft2.getHealthProperty(), craft2.getColor(), vb.getWidth() - 270,
 				vb.getHeight() - 30, 10);
@@ -451,10 +449,6 @@ public class Gravity extends Application {
 
 		Menu menuProps = new Menu("Properties");
 
-		//MenuItem craftProps = new MenuItem("Craft");
-
-		System.out.println("lloking vor crafts" + crafts.size());
-
 		int i = 1;
 		for (Craft craft : crafts)
 		{
@@ -466,7 +460,6 @@ public class Gravity extends Application {
 			miCp.setGraphic(iv);
 			miCp.setOnAction(e -> props.showPropertyDialog(stage));
 			menuProps.getItems().add(miCp);
-			System.out.println("props added");
 		}
 
 		menuBar.getMenus().addAll(menuGame, menuScenario, menuProps);
