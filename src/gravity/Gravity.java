@@ -385,7 +385,7 @@ public class Gravity extends Application {
 	private void layoutEnergyBars() {
 
 		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
-		double[] xpos = { 20.0, vb.getWidth() - 270, vb.getWidth() / 2 + 5 * 50 };
+		double[] xpos = { 20.0, vb.getWidth() - 270, vb.getWidth() / 2 - (5 * 50)/2};
 		
 		for (int i = 0; i < crafts.size(); i++) {
 			Craft craft = crafts.get(i);
@@ -414,6 +414,7 @@ public class Gravity extends Application {
 		energyBars.clear();
 		flyingObjects.clear();
 		sols.clear();
+		crafts.clear();
 		worldCreated = false;
 	}
 
