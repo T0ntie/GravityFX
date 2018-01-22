@@ -5,7 +5,6 @@ import static java.lang.Math.sqrt;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Optional;
 
 import gravity.props.CraftProps;
 import javafx.animation.AnimationTimer;
@@ -24,20 +23,16 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -259,6 +254,7 @@ public class Gravity extends Application {
 							Shot sh2 = (Shot) fo2;
 							cr1.damage(timestamp, sh2.getMass() / 2);
 							if ((cr1).isShieldUp() == false) {
+								sh2.explode = true;
 								sh2.despawn();
 								Gravity.playSound("hitcraft");
 							} else {
@@ -372,32 +368,32 @@ public class Gravity extends Application {
 
 		Craft craft1;
 		Craft craft2;
-		if (crafts.isEmpty())
-		{
-			craft1 = new Craft(500, vb.getHeight() / 2, 20, 10, -200, 40, "A", "D", "W", "S", "SPACE",
-					0);
-			craft2 = new Craft(vb.getWidth() - 500, vb.getHeight() / 2, 20, -10, 200, 40, "LEFT", "RIGHT", "UP", "CLEAR", "INSERT",
-					1);
+		if (crafts.isEmpty()) {
+			craft1 = new Craft(500, vb.getHeight() / 2, 20, 10, -200, 40, "A", "D", "W", "S", "SPACE", 0);
+			craft2 = new Craft(vb.getWidth() - 500, vb.getHeight() / 2, 20, -10, 200, 40, "LEFT", "RIGHT", "UP",
+					"CLEAR", "INSERT", 1);
 			crafts.addAll(craft1, craft2);
-		}
-		else 
-		{
+		} else {
 			craft1 = crafts.get(0);
 			craft2 = crafts.get(1);
 		}
-		
+
 		flyingObjects.addAll(craft1, craft2);
+		layoutEnergyBars();
+	}
 
-		EnergyBar bar1 = new EnergyBar(craft1.getHealthProperty(), craft1.getColor(), 20, vb.getHeight() - 30, 50 * 5,
-				10);
-		EnergyBar bar2 = new EnergyBar(craft2.getHealthProperty(), craft2.getColor(), vb.getWidth() - 270,
-				vb.getHeight() - 30, 50 * 5, 10);
-		EnergyBar sbar1 = new EnergyBar(craft1.getShieldPowerProperty(), craft1.getColor().brighter(), 20,
-				vb.getHeight() - 15, 50 * 5, 5);
-		EnergyBar sbar2 = new EnergyBar(craft2.getShieldPowerProperty(), craft2.getColor().brighter(),
-				vb.getWidth() - 270, vb.getHeight() - 15, 50 * 5, 5);
+	private void layoutEnergyBars() {
 
-		energyBars.addAll(bar1, bar2, sbar1, sbar2);
+		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
+		double[] xpos = { 20.0, vb.getWidth() - 270, vb.getWidth() / 2 + 5 * 50 };
+		
+		for (int i = 0; i < crafts.size(); i++) {
+			Craft craft = crafts.get(i);
+			
+			EnergyBar hbar = new EnergyBar(craft.getHealthProperty(), craft.getColor(), xpos[i], vb.getHeight()-30, 50*5, 10);
+			EnergyBar sbar = new EnergyBar(craft.getShieldPowerProperty(), craft.getColor().brighter(), xpos[i], vb.getHeight()-15, 50*5, 5);
+			energyBars.addAll(hbar, sbar);
+		}
 	}
 
 	private void createCentralSunScenario() {

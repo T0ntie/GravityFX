@@ -6,10 +6,12 @@ import java.util.Random;
 import gravity.props.CraftProps;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
+import javafx.stage.Screen;
 
 public class Craft extends FlyingObject {
 
@@ -30,7 +32,7 @@ public class Craft extends FlyingObject {
 		}
 	}
 
-	final Color[] color = { Color.DARKRED, Color.ROYALBLUE };
+	final Color[] color = { Color.DARKRED, Color.NAVY };
 
 	final static Random random = new Random();
 	long explosion = 0;
@@ -41,7 +43,7 @@ public class Craft extends FlyingObject {
 	double craftRadius;
 	double shieldRadius = 50;
 
-	private final DoubleProperty health; 
+	private final DoubleProperty health;
 	private DoubleProperty shieldPower = new SimpleDoubleProperty(50.0);
 
 	public Craft(double centerX, double centerY, double radius, double xVelocity, double yVelocity, double mass,
@@ -53,7 +55,7 @@ public class Craft extends FlyingObject {
 		this.properties.setKeyRight(keyRight);
 		this.properties.setKeyFire(keyFire);
 		this.properties.setKeyShield(keyShield);
-		this.health = new SimpleDoubleProperty(properties.getMaxHealth());
+		this.health = new SimpleDoubleProperty(50);
 		System.out.println("health initialized!" + health);
 		this.craftRadius = radius;
 		this.player = Math.min(player, MAX_PLAYERS_DEFINED);
@@ -80,10 +82,6 @@ public class Craft extends FlyingObject {
 	// Explosion explosion = null;
 
 	public void show(GraphicsContext gc, long timestamp, long elapsedTime) {
-
-		// if (explosion != null) {
-		// explosion.show(gc, timestamp, getCenterX(), getCenterY());
-		// } else {
 
 		Image img;
 		if (explosion > 0) {

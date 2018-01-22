@@ -22,9 +22,6 @@ public class CraftProps {
 	//projectile mass
 	private double fireImpact = 10;
 	
-	//Maximal healtz
-	private double maxHealth = 50;
-	
 	//Image of the craft
 	private Image craftImg;
 	
@@ -40,16 +37,6 @@ public class CraftProps {
 		super();
 	}
 	
-
-
-	public double getMaxHealth() {
-		return maxHealth;
-	}
-
-	public void setMaxHealth(double maxHealth) {
-		this.maxHealth = maxHealth;
-	}
-
 	public String getKeyLeft() {
 		return keyLeft;
 	}
@@ -213,17 +200,6 @@ public class CraftProps {
 		});
 		vb.getChildren().addAll(new Label("Key Shield"), tfSk);
 
-		Slider slMh = new Slider();
-		slMh.setMin(0);
-		slMh.setMax(500);
-		slMh.setValue(this.maxHealth);
-		slMh.setShowTickLabels(true);
-		slMh.setShowTickMarks(true);
-		slMh.setMajorTickUnit(10);
-		slMh.setMinorTickCount(1);
-		slMh.setBlockIncrement(5);
-		vb.getChildren().addAll(new Label("Maximum Health"), slMh);
-
 		dialog.getDialogPane().setContent(vb);
 
 		dialog.setResultConverter(dialogButton -> {
@@ -236,7 +212,6 @@ public class CraftProps {
 				this.keyRight = tfRk.getText();
 				this.keyFire = tfFk.getText();
 				this.keyShield = tfSk.getText();
-				this.maxHealth = slMh.getValue();
 				return this;
 			}
 			return null;
