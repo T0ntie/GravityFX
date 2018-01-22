@@ -41,12 +41,11 @@ public class Craft extends FlyingObject {
 	double craftRadius;
 	double shieldRadius = 50;
 
-	private DoubleProperty health = new SimpleDoubleProperty(50.0);
+	private final DoubleProperty health; 
 	private DoubleProperty shieldPower = new SimpleDoubleProperty(50.0);
 
 	public Craft(double centerX, double centerY, double radius, double xVelocity, double yVelocity, double mass,
-			String keyLeft, String keyRight, String keyThrust, String keyShield, String keyFire, double healthbarX,
-			double healthbarY, int player) {
+			String keyLeft, String keyRight, String keyThrust, String keyShield, String keyFire, int player) {
 		super(centerX, centerY, radius, xVelocity, yVelocity, mass);
 		this.properties = new CraftProps();
 		this.properties.setKeyThrust(keyThrust);
@@ -54,6 +53,8 @@ public class Craft extends FlyingObject {
 		this.properties.setKeyRight(keyRight);
 		this.properties.setKeyFire(keyFire);
 		this.properties.setKeyShield(keyShield);
+		this.health = new SimpleDoubleProperty(properties.getMaxHealth());
+		System.out.println("health initialized!" + health);
 		this.craftRadius = radius;
 		this.player = Math.min(player, MAX_PLAYERS_DEFINED);
 		properties.setCraftImg(craftImgA[player]);

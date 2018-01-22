@@ -370,12 +370,23 @@ public class Gravity extends Application {
 
 		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
 
-		Craft craft1 = new Craft(500, vb.getHeight() / 2, 20, 10, -200, 40, "LEFT", "RIGHT", "UP", "CLEAR", "INSERT",
-				100, 5, 0);
-		Craft craft2 = new Craft(vb.getWidth() - 500, vb.getHeight() / 2, 20, -10, 200, 40, "A", "D", "W", "S", "SPACE",
-				100, 20, 1);
+		Craft craft1;
+		Craft craft2;
+		if (crafts.isEmpty())
+		{
+			craft1 = new Craft(500, vb.getHeight() / 2, 20, 10, -200, 40, "A", "D", "W", "S", "SPACE",
+					0);
+			craft2 = new Craft(vb.getWidth() - 500, vb.getHeight() / 2, 20, -10, 200, 40, "LEFT", "RIGHT", "UP", "CLEAR", "INSERT",
+					1);
+			crafts.addAll(craft1, craft2);
+		}
+		else 
+		{
+			craft1 = crafts.get(0);
+			craft2 = crafts.get(1);
+		}
+		
 		flyingObjects.addAll(craft1, craft2);
-		crafts.addAll(craft1, craft2);
 
 		EnergyBar bar1 = new EnergyBar(craft1.getHealthProperty(), craft1.getColor(), 20, vb.getHeight() - 30, 50 * 5,
 				10);
