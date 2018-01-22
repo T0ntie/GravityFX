@@ -1,5 +1,6 @@
 package gravity.props;
 
+import gravity.Gravity;
 import javafx.event.EventHandler;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -152,7 +153,7 @@ public class CraftProps {
 		vb.getChildren().addAll(new Label("Projectile Impact"), slFi);
 
 		TextField tfTk = new TextField();
-		tfTk.setPromptText(getKeyThurst());
+		tfTk.setText(getKeyThurst());
 		tfTk.setEditable(false);
 		tfTk.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent e) {
@@ -162,7 +163,7 @@ public class CraftProps {
 		vb.getChildren().addAll(new Label("Key Thurst"), tfTk);
 
 		TextField tfLk = new TextField();
-		tfLk.setPromptText(getKeyLeft());
+		tfLk.setText(getKeyLeft());
 		tfLk.setEditable(false);
 		tfLk.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent e) {
@@ -172,7 +173,7 @@ public class CraftProps {
 		vb.getChildren().addAll(new Label("Key Steer Left"), tfLk);
 
 		TextField tfRk = new TextField();
-		tfRk.setPromptText(getKeyRight());
+		tfRk.setText(getKeyRight());
 		tfRk.setEditable(false);
 		tfRk.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent e) {
@@ -182,7 +183,7 @@ public class CraftProps {
 		vb.getChildren().addAll(new Label("Key Steer Right"), tfRk);
 
 		TextField tfFk = new TextField();
-		tfFk.setPromptText(getKeyFire());
+		tfFk.setText(getKeyFire());
 		tfFk.setEditable(false);
 		tfFk.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent e) {
@@ -192,7 +193,7 @@ public class CraftProps {
 		vb.getChildren().addAll(new Label("Key Fire"), tfFk);
 
 		TextField tfSk = new TextField();
-		tfSk.setPromptText(getKeyShield());
+		tfSk.setText(getKeyShield());
 		tfSk.setEditable(false);
 		tfSk.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent e) {

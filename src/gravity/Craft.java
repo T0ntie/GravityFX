@@ -12,9 +12,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 
 public class Craft extends FlyingObject {
-	
+
 	public final CraftProps properties;
-	
+
 	final Image[] craftImgA = { new Image("craftred.png"), new Image("craftblue.png") };
 	final Image[] shieldImgA = { new Image("shieldred.png"), new Image("shieldblue.png") };
 
@@ -56,13 +56,11 @@ public class Craft extends FlyingObject {
 		this.properties.setKeyShield(keyShield);
 		this.craftRadius = radius;
 		this.player = Math.min(player, MAX_PLAYERS_DEFINED);
-		//this.craftImg = craftImgA[player];
 		properties.setCraftImg(craftImgA[player]);
 		this.shieldImg = shieldImgA[player];
 	}
-	
-	public CraftProps getProperties()
-	{
+
+	public CraftProps getProperties() {
 		return this.properties;
 	}
 
@@ -144,12 +142,12 @@ public class Craft extends FlyingObject {
 	public FlyingObject fire(long timestamp) {
 		FlyingObject projectile = null;
 
-		//if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 0.1) {
-		if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 1 / properties.getFireRate() ) {
+		if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 1 / properties.getFireRate()) {
 			double x = Math.sin(Math.toRadians(orientation)) * properties.getFirePower();
 			double y = -Math.cos(Math.toRadians(orientation)) * properties.getFirePower();
 			lastFired = timestamp;
-			projectile = new Shot(getCenterX(), getCenterY(), getXVelocity() + x, getYVelocity() + y, properties.getFireImpact(), timestamp);
+			projectile = new Shot(getCenterX(), getCenterY(), getXVelocity() + x, getYVelocity() + y,
+					properties.getFireImpact(), timestamp);
 			addVelocity(-x / 20, -y / 20);
 			Gravity.playSound("shot");
 		}

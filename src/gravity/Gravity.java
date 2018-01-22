@@ -255,9 +255,11 @@ public class Gravity extends Application {
 					bounce(fo1, fo2, deltaX, deltaY);
 					if (fo1 instanceof Craft) {
 						if (fo2 instanceof Shot) {
-							((Craft) fo1).damage(timestamp, 5);
-							if (((Craft) fo1).isShieldUp() == false) {
-								((Shot) fo2).despawn();
+							Craft cr1 = (Craft) fo1;
+							Shot sh2 = (Shot) fo2;
+							cr1.damage(timestamp, sh2.getMass()/2);
+							if ((cr1).isShieldUp() == false) {
+								sh2.despawn();
 								Gravity.playSound("hitcraft");
 							} else {
 								Gravity.playSound("hitshield");
