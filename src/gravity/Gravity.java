@@ -257,7 +257,7 @@ public class Gravity extends Application {
 						if (fo2 instanceof Shot) {
 							Craft cr1 = (Craft) fo1;
 							Shot sh2 = (Shot) fo2;
-							cr1.damage(timestamp, sh2.getMass()/2);
+							cr1.damage(timestamp, sh2.getMass() / 2);
 							if ((cr1).isShieldUp() == false) {
 								sh2.despawn();
 								Gravity.playSound("hitcraft");
@@ -376,14 +376,15 @@ public class Gravity extends Application {
 				100, 20, 1);
 		flyingObjects.addAll(craft1, craft2);
 		crafts.addAll(craft1, craft2);
-		
-		EnergyBar bar1 = new EnergyBar(craft1.getHealthProperty(), craft1.getColor(), 20, vb.getHeight() - 30, 10);
+
+		EnergyBar bar1 = new EnergyBar(craft1.getHealthProperty(), craft1.getColor(), 20, vb.getHeight() - 30, 50 * 5,
+				10);
 		EnergyBar bar2 = new EnergyBar(craft2.getHealthProperty(), craft2.getColor(), vb.getWidth() - 270,
-				vb.getHeight() - 30, 10);
+				vb.getHeight() - 30, 50 * 5, 10);
 		EnergyBar sbar1 = new EnergyBar(craft1.getShieldPowerProperty(), craft1.getColor().brighter(), 20,
-				vb.getHeight() - 15, 5);
+				vb.getHeight() - 15, 50 * 5, 5);
 		EnergyBar sbar2 = new EnergyBar(craft2.getShieldPowerProperty(), craft2.getColor().brighter(),
-				vb.getWidth() - 270, vb.getHeight() - 15, 5);
+				vb.getWidth() - 270, vb.getHeight() - 15, 50 * 5, 5);
 
 		energyBars.addAll(bar1, bar2, sbar1, sbar2);
 	}
@@ -452,8 +453,7 @@ public class Gravity extends Application {
 		Menu menuProps = new Menu("Properties");
 
 		int i = 1;
-		for (Craft craft : crafts)
-		{
+		for (Craft craft : crafts) {
 			CraftProps props = craft.getProperties();
 			MenuItem miCp = new MenuItem("Craft Player " + i++);
 			ImageView iv = new ImageView(props.getCraftImg());
