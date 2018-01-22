@@ -33,6 +33,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -56,6 +57,7 @@ public class Gravity extends Application {
 	private final FrameStats frameStats = new FrameStats();
 	private ObservableList<FlyingObject> flyingObjects = FXCollections.observableArrayList();
 	private ObservableList<Sol> sols = FXCollections.observableArrayList();
+	private ObservableList<Craft> crafts = FXCollections.observableArrayList();
 	private ObservableList<EnergyBar> energyBars = FXCollections.observableArrayList();
 
 	private final static Sound sound = new Sound(2);
@@ -104,7 +106,7 @@ public class Gravity extends Application {
 		root.setCenter(canvasPane);
 		root.setBottom(stats);
 
-		// applyOnResizeListener(theScene, canvas, x);
+		createWorld();
 
 		startAnimation(canvas);
 
@@ -152,7 +154,7 @@ public class Gravity extends Application {
 		gx.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
 		if (!worldCreated) {
-			createWorld(timestamp);
+			createWorld();
 		}
 
 		for (Sol so : sols) {
@@ -344,25 +346,25 @@ public class Gravity extends Application {
 		Gravity.sound.playSound(sound);
 	}
 
-	private void createWorld(long timestamp) {
+	private void createWorld() {
 
 		switch (this.scenario) {
 		case SCENARIO_DOGFIGHT:
-			createDogfightScenario(timestamp);
+			createDogfightScenario();
 			break;
 		case SCENARIO_CENTRAL_SUN:
-			createCentralSunScenario(timestamp);
+			createCentralSunScenario();
 			break;
 
 		case SCENARIO_TWO_SUNS:
-			createTwoSunsScenario(timestamp);
+			createTwoSunsScenario();
 			break;
 
 		}
 		worldCreated = true;
 	}
 
-	private void createDogfightScenario(long timestamp) {
+	private void createDogfightScenario() {
 
 		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
 
@@ -370,8 +372,10 @@ public class Gravity extends Application {
 				100, 5, 0);
 		Craft craft2 = new Craft(vb.getWidth() - 500, vb.getHeight() / 2, 20, -10, 200, 40, "A", "D", "W", "S", "SPACE",
 				100, 20, 1);
-		flyingObjects.add(craft1);
-		flyingObjects.add(craft2);
+		flyingObjects.addAll(craft1, craft2);
+		crafts.addAll(craft1, craft2);
+		
+		System.out.println("crafts add3d" );
 
 		EnergyBar bar1 = new EnergyBar(craft1.getHealthProperty(), craft1.getColor(), 20, vb.getHeight() - 30, 10);
 		EnergyBar bar2 = new EnergyBar(craft2.getHealthProperty(), craft2.getColor(), vb.getWidth() - 270,
@@ -384,15 +388,15 @@ public class Gravity extends Application {
 		energyBars.addAll(bar1, bar2, sbar1, sbar2);
 	}
 
-	private void createCentralSunScenario(long timestamp) {
+	private void createCentralSunScenario() {
 		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
-		createDogfightScenario(timestamp);
+		createDogfightScenario();
 		sols.add(new Sol((vb.getWidth() / 2), (vb.getHeight() / 2), 60, 20000));
 	}
 
-	private void createTwoSunsScenario(long timestamp) {
+	private void createTwoSunsScenario() {
 		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
-		createDogfightScenario(timestamp);
+		createDogfightScenario();
 
 		sols.add(new Sol((vb.getWidth() / 3), (vb.getHeight() / 3), 50, 10000));
 		sols.add(new Sol((vb.getWidth() * 2 / 3), (vb.getHeight() * 2 / 3), 50, 10000));
@@ -412,81 +416,6 @@ public class Gravity extends Application {
 	private void setScenario(String scenario) {
 		this.scenario = scenario;
 		restart();
-	}
-
-	private void craftDialog(Stage owner) {
-
-		Dialog<CraftProps> dialog = new Dialog<>();
-
-		dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-		Slider slFr = new Slider();
-		slFr.setMin(0);
-		slFr.setMax(30);
-		slFr.setValue(Craft.fireRate);
-		slFr.setShowTickLabels(true);
-		slFr.setShowTickMarks(true);
-		slFr.setMajorTickUnit(10);
-		slFr.setMinorTickCount(1);
-		slFr.setBlockIncrement(5);
-
-		Slider slFp = new Slider();
-		slFp.setMin(0);
-		slFp.setMax(1500);
-		slFp.setValue(Craft.firePower);
-		slFp.setShowTickLabels(true);
-		slFp.setShowTickMarks(true);
-		slFp.setMajorTickUnit(500);
-		slFp.setMinorTickCount(200);
-		slFp.setBlockIncrement(500);
-
-		Slider slFi = new Slider();
-		slFi.setMin(0);
-		slFi.setMax(100);
-		slFi.setValue(Craft.fireImpact);
-		slFi.setShowTickLabels(true);
-		slFi.setShowTickMarks(true);
-		slFi.setMajorTickUnit(10);
-		slFi.setMinorTickCount(5);
-		slFi.setBlockIncrement(10);
-
-		
-		VBox vb = new VBox();
-
-		vb.getChildren().addAll(new Label("Shots per second"), slFr, new Label("velocity of projectile"), slFp, new Label("mass of projectile"), slFi);
-
-		dialog.getDialogPane().setContent(vb);
-
-		dialog.setResultConverter(dialogButton -> {
-			if (dialogButton == ButtonType.OK) {
-				return new CraftProps(slFr.getValue(), slFp.getValue(), slFi.getValue());
-			}
-			return null;
-		});
-
-		dialog.initOwner(owner);
-		Optional<CraftProps> result = dialog.showAndWait();
-		result.ifPresent(props -> {
-			Craft.fireRate = props.getFireRate();
-			Craft.firePower = props.getFirePower();
-			Craft.fireImpact = props.getFireImpact();
-		});
-
-		// TextInputDialog dialog = new TextInputDialog("walter");
-		// dialog.setTitle("Text Input Dialog");
-		// dialog.setHeaderText("Look, a Text Input Dialog");
-		// dialog.setContentText("Please enter your name:");
-		// dialog.initOwner(owner);
-		// Optional<String> result = dialog.showAndWait();
-		// result.ifPresent(name -> System.out.println("Your name: " + name));
-
-		// Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		// alert.setTitle("Scene Dialog");
-		// alert.setHeaderText("Configure background scene");
-		// alert.setContentText("I have a great message for you!");
-		// alert.initOwner(owner); // This sets the owner of this Dialog
-		//
-		// alert.showAndWait();
 	}
 
 	private MenuBar createMenus(Stage stage) {
@@ -522,9 +451,23 @@ public class Gravity extends Application {
 
 		Menu menuProps = new Menu("Properties");
 
-		MenuItem craftProps = new MenuItem("Craft");
-		craftProps.setOnAction(e -> craftDialog(stage));
-		menuProps.getItems().addAll(craftProps);
+		//MenuItem craftProps = new MenuItem("Craft");
+
+		System.out.println("lloking vor crafts" + crafts.size());
+
+		int i = 1;
+		for (Craft craft : crafts)
+		{
+			CraftProps props = craft.getProperties();
+			MenuItem miCp = new MenuItem("Craft Player " + i++);
+			ImageView iv = new ImageView(props.getCraftImg());
+			iv.setPreserveRatio(true);
+			iv.setFitHeight(25);
+			miCp.setGraphic(iv);
+			miCp.setOnAction(e -> props.showPropertyDialog(stage));
+			menuProps.getItems().add(miCp);
+			System.out.println("props added");
+		}
 
 		menuBar.getMenus().addAll(menuGame, menuScenario, menuProps);
 		return menuBar;
