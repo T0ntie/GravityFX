@@ -5,20 +5,17 @@ import java.util.Random;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
-import javafx.stage.Screen;
-import junk.CraftProps;
 
 public class Craft extends FlyingObject {
 
-	public final static Image BLUE_CRAFT_IMAGE = new Image("craftblue.png");
-	public final static Image RED_CRAFT_IMAGE = new Image("craftred.png");
-	public final static Image BLUE_SHIELD_IMAGE = new Image("shieldblue.png");
-	public final static Image RED_SHIELD_IMAGE = new Image("shieldred.png");
+	public final static Image BLUE_CRAFT_IMAGE = new Image("imgs/craftblue.png");
+	public final static Image RED_CRAFT_IMAGE = new Image("imgs/craftred.png");
+	public final static Image BLUE_SHIELD_IMAGE = new Image("imgs/shieldblue.png");
+	public final static Image RED_SHIELD_IMAGE = new Image("imgs/shieldred.png");
 
 	private final Image craftImg;
 	private final Image shieldImg;
@@ -41,11 +38,11 @@ public class Craft extends FlyingObject {
 	private double fireImpact = 10;
 
 
-	final static Image thrustImg = new Image("thrust.png");
+	final static Image thrustImg = new Image("imgs/thrust.png");
 	final static Image[] explosionImg = new Image[20];
 	static {
 		for (int i = 0; i < 20; i++) {
-			explosionImg[i] = new Image("explosion" + i + ".png");
+			explosionImg[i] = new Image("imgs/explosion" + i + ".png");
 		}
 	}
 

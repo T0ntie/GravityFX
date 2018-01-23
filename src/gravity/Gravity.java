@@ -28,14 +28,12 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import junk.CraftProps;
 
 public class Gravity extends Application {
 
@@ -55,7 +53,7 @@ public class Gravity extends Application {
 	private ObservableList<Craft> crafts = FXCollections.observableArrayList();
 	private ObservableList<EnergyBar> energyBars = FXCollections.observableArrayList();
 
-	private final static Sound sound = new Sound(2);
+	private final static Sound sound = new Sound();
 
 	private boolean worldCreated = false;
 
@@ -484,10 +482,6 @@ public class Gravity extends Application {
 		private double meanFrameInterval; // millis
 		private final ReadOnlyStringWrapper text = new ReadOnlyStringWrapper(this, "text", "FPS: 0");
 
-		public long getFrameCount() {
-			return frameCount;
-		}
-
 		public double getMeanFrameInterval() {
 			return meanFrameInterval;
 		}
@@ -498,11 +492,6 @@ public class Gravity extends Application {
 			frameCount++;
 			text.set(toString());
 		}
-
-		public String getText() {
-			return text.get();
-		}
-
 		public ReadOnlyStringProperty textProperty() {
 			return text.getReadOnlyProperty();
 		}

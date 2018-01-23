@@ -8,7 +8,7 @@ public class Shot extends FlyingObject {
 
 	private final long timeOfBirth;
 	public final static double SECONDS_TO_LIVE = 5.0;
-	private final static Image burstImg = new Image("shotexplode.png");
+	private final static Image burstImg = new Image("imgs/shotexplode.png");
 	
 	public boolean explode = false; 
 

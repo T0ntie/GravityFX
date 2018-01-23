@@ -2,11 +2,10 @@ package gravity;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 
 public class Sol extends GravityObject{
 	
-	final static Image solImg = new Image("sol2.png");
+	final static Image solImg = new Image("img/sol.png");
 	final static double RADIUS_RATIO = 70/30; //ratio between the outer circle of the image and the effective circle of the displayed sun
     private final double imageSide;
 
