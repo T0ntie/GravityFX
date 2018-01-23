@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import gravity.props.CraftProps;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -36,6 +35,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import junk.CraftProps;
 
 public class Gravity extends Application {
 
@@ -369,9 +369,10 @@ public class Gravity extends Application {
 		Craft craft1;
 		Craft craft2;
 		if (crafts.isEmpty()) {
-			craft1 = new Craft(500, vb.getHeight() / 2, 20, 10, -200, 40, "A", "D", "W", "S", "SPACE", 0);
+			craft1 = new Craft(500, vb.getHeight() / 2, 20, 10, -200, 40, "A", "D", "W", "S", "SPACE",
+					Craft.BLUE_CRAFT_IMAGE, Craft.BLUE_SHIELD_IMAGE, Color.MEDIUMBLUE);
 			craft2 = new Craft(vb.getWidth() - 500, vb.getHeight() / 2, 20, -10, 200, 40, "LEFT", "RIGHT", "UP",
-					"CLEAR", "INSERT", 1);
+					"CLEAR", "INSERT", Craft.RED_CRAFT_IMAGE, Craft.RED_SHIELD_IMAGE, Color.DARKRED);
 			crafts.addAll(craft1, craft2);
 		} else {
 			craft1 = crafts.get(0);
@@ -385,13 +386,15 @@ public class Gravity extends Application {
 	private void layoutEnergyBars() {
 
 		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
-		double[] xpos = { 20.0, vb.getWidth() - 270, vb.getWidth() / 2 - (5 * 50)/2};
-		
+		double[] xpos = { 20.0, vb.getWidth() - 270, vb.getWidth() / 2 - (5 * 50) / 2 };
+
 		for (int i = 0; i < crafts.size(); i++) {
 			Craft craft = crafts.get(i);
-			
-			EnergyBar hbar = new EnergyBar(craft.getHealthProperty(), craft.getColor(), xpos[i], vb.getHeight()-30, 50*5, 10);
-			EnergyBar sbar = new EnergyBar(craft.getShieldPowerProperty(), craft.getColor().brighter(), xpos[i], vb.getHeight()-15, 50*5, 5);
+
+			EnergyBar hbar = new EnergyBar(craft.getHealthProperty(), craft.getColor(), xpos[i], vb.getHeight() - 30,
+					50 * 5, 10);
+			EnergyBar sbar = new EnergyBar(craft.getShieldPowerProperty(), craft.getColor().brighter(), xpos[i],
+					vb.getHeight() - 15, 50 * 5, 5);
 			energyBars.addAll(hbar, sbar);
 		}
 	}
@@ -458,21 +461,21 @@ public class Gravity extends Application {
 
 		menuScenario.getItems().addAll(miSdf, miScs, miSts);
 
-		Menu menuProps = new Menu("Properties");
-
-		int i = 1;
-		for (Craft craft : crafts) {
-			CraftProps props = craft.getProperties();
-			MenuItem miCp = new MenuItem("Craft Player " + i++);
-			ImageView iv = new ImageView(props.getCraftImg());
-			iv.setPreserveRatio(true);
-			iv.setFitHeight(25);
-			miCp.setGraphic(iv);
-			miCp.setOnAction(e -> props.showPropertyDialog(stage));
-			menuProps.getItems().add(miCp);
-		}
-
-		menuBar.getMenus().addAll(menuGame, menuScenario, menuProps);
+//		Menu menuProps = new Menu("Properties");
+//
+//		int i = 1;
+//		for (Craft craft : crafts) {
+//			CraftProps props = craft.getProperties();
+//			MenuItem miCp = new MenuItem("Craft Player " + i++);
+//			//ImageView iv = new ImageView(props.getCraftImg());
+//			//iv.setPreserveRatio(true);
+//			//iv.setFitHeight(25);
+//			//miCp.setGraphic(iv);
+//			miCp.setOnAction(e -> props.showPropertyDialog(stage));
+//			menuProps.getItems().add(miCp);
+//		}
+//
+		menuBar.getMenus().addAll(menuGame, menuScenario);//, menuProps);
 		return menuBar;
 	}
 

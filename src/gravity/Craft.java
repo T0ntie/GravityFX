@@ -3,7 +3,6 @@ package gravity;
 import java.util.ArrayList;
 import java.util.Random;
 
-import gravity.props.CraftProps;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Rectangle2D;
@@ -12,17 +11,35 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 import javafx.stage.Screen;
+import junk.CraftProps;
 
 public class Craft extends FlyingObject {
 
-	public final CraftProps properties;
+	public final static Image BLUE_CRAFT_IMAGE = new Image("craftblue.png");
+	public final static Image RED_CRAFT_IMAGE = new Image("craftred.png");
+	public final static Image BLUE_SHIELD_IMAGE = new Image("shieldblue.png");
+	public final static Image RED_SHIELD_IMAGE = new Image("shieldred.png");
 
-	final Image[] craftImgA = { new Image("craftred.png"), new Image("craftblue.png") };
-	final Image[] shieldImgA = { new Image("shieldred.png"), new Image("shieldblue.png") };
+	private final Image craftImg;
+	private final Image shieldImg;
+	private final Color color;
+	
+	//Key codes
+	private String keyFire;
+	private String keyLeft;
+	private String keyRight;
+	private String keyThrust;
+	private String keyShield;
+	
+	//shots per second
+	private double fireRate = 10;
 
-	final Image shieldImg;
+	//projectile velocity pixel per second
+	private double firePower = 500;
+	
+	//projectile mass
+	private double fireImpact = 10;
 
-	final static int MAX_PLAYERS_DEFINED = 1;
 
 	final static Image thrustImg = new Image("thrust.png");
 	final static Image[] explosionImg = new Image[20];
@@ -32,13 +49,10 @@ public class Craft extends FlyingObject {
 		}
 	}
 
-	final Color[] color = { Color.DARKRED, Color.NAVY };
-
 	final static Random random = new Random();
 	long explosion = 0;
 	int showthrust = 0;
 	long shieldIsUp = 0;
-	int player = 0;
 
 	double craftRadius;
 	double shieldRadius = 50;
@@ -47,24 +61,18 @@ public class Craft extends FlyingObject {
 	private DoubleProperty shieldPower = new SimpleDoubleProperty(50.0);
 
 	public Craft(double centerX, double centerY, double radius, double xVelocity, double yVelocity, double mass,
-			String keyLeft, String keyRight, String keyThrust, String keyShield, String keyFire, int player) {
+			String keyLeft, String keyRight, String keyThrust, String keyShield, String keyFire, Image craftImg, Image shieldImg, Color color) {
 		super(centerX, centerY, radius, xVelocity, yVelocity, mass);
-		this.properties = new CraftProps();
-		this.properties.setKeyThrust(keyThrust);
-		this.properties.setKeyLeft(keyLeft);
-		this.properties.setKeyRight(keyRight);
-		this.properties.setKeyFire(keyFire);
-		this.properties.setKeyShield(keyShield);
+		this.keyThrust = keyThrust;
+		this.keyLeft = keyLeft;
+		this.keyRight = keyRight;
+		this.keyFire = keyFire;
+		this.keyShield = keyShield;
 		this.health = new SimpleDoubleProperty(50);
-		System.out.println("health initialized!" + health);
 		this.craftRadius = radius;
-		this.player = Math.min(player, MAX_PLAYERS_DEFINED);
-		properties.setCraftImg(craftImgA[player]);
-		this.shieldImg = shieldImgA[player];
-	}
-
-	public CraftProps getProperties() {
-		return this.properties;
+		this.craftImg = craftImg;
+		this.shieldImg = shieldImg;
+		this.color = color;
 	}
 
 	public DoubleProperty getHealthProperty() {
@@ -76,7 +84,7 @@ public class Craft extends FlyingObject {
 	}
 
 	public Color getColor() {
-		return color[this.player];
+		return color;
 	}
 
 	// Explosion explosion = null;
@@ -92,7 +100,7 @@ public class Craft extends FlyingObject {
 				despawn();
 			}
 		} else {
-			img = properties.getCraftImg();
+			img = craftImg;
 		}
 
 		Affine a = new Affine();
@@ -102,8 +110,8 @@ public class Craft extends FlyingObject {
 		gc.setTransform(a);
 		gc.drawImage(img, getCenterX(), getCenterY());
 		if (explosion == 0 && showthrust-- > 0) {
-			gc.drawImage(thrustImg, getCenterX() + properties.getCraftImg().getWidth() / 2 - thrustImg.getWidth() / 2,
-					getCenterY() + properties.getCraftImg().getHeight());
+			gc.drawImage(thrustImg, getCenterX() + craftImg.getWidth() / 2 - thrustImg.getWidth() / 2,
+					getCenterY() + craftImg.getHeight());
 		}
 		gc.restore();
 		if (shieldIsUp > 0) {
@@ -141,12 +149,12 @@ public class Craft extends FlyingObject {
 	public FlyingObject fire(long timestamp) {
 		FlyingObject projectile = null;
 
-		if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 1 / properties.getFireRate()) {
-			double x = Math.sin(Math.toRadians(orientation)) * properties.getFirePower();
-			double y = -Math.cos(Math.toRadians(orientation)) * properties.getFirePower();
+		if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 1 / fireRate) {
+			double x = Math.sin(Math.toRadians(orientation)) * firePower;
+			double y = -Math.cos(Math.toRadians(orientation)) * firePower;
 			lastFired = timestamp;
 			projectile = new Shot(getCenterX(), getCenterY(), getXVelocity() + x, getYVelocity() + y,
-					properties.getFireImpact(), timestamp);
+					fireImpact, timestamp);
 			addVelocity(-x / 20, -y / 20);
 			Gravity.playSound("shot");
 		}
@@ -157,23 +165,23 @@ public class Craft extends FlyingObject {
 
 		FlyingObject projectile = null;
 
-		if (input.contains(properties.getKeyLeft())) {
+		if (input.contains(keyLeft)) {
 			rotateLeft(5);
 		}
 
-		if (input.contains(properties.getKeyRight())) {
+		if (input.contains(keyRight)) {
 			rotateRight(5);
 		}
 
-		if (input.contains(properties.getKeyThurst())) {
+		if (input.contains(keyThrust)) {
 			accellerate(timestamp);
 		}
 
-		if (input.contains(properties.getKeyFire())) {
+		if (input.contains(keyFire)) {
 			projectile = fire(timestamp);
 		}
 
-		if (input.contains(properties.getKeyShield())) {
+		if (input.contains(keyShield)) {
 			shieldUp(timestamp);
 		} else {
 			shieldDown(timestamp);
