@@ -5,14 +5,15 @@ import javafx.scene.image.Image;
 
 public class Sol extends GravityObject{
 	
-	final static Image solImg = new Image("img/sol.png");
+	final static Image solImg = new Image("imgs/sol.png");
 	final static double RADIUS_RATIO = 70/30; //ratio between the outer circle of the image and the effective circle of the displayed sun
     private final double imageSide;
 
 	
 	public Sol(double centerX, double centerY, double radius, double mass)
 	{
-		super(centerX, centerY, radius, mass);
+		super(centerX, centerY, radius, mass);		System.out.println("Whats up");
+
         imageSide = 2*radius*RADIUS_RATIO/Math.sqrt(2);
 	}
 	

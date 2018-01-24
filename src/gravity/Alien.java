@@ -59,7 +59,7 @@ public class Alien extends Craft {
 		
 		if (distance[targetIndex] < 1000)
 		{
-			if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 1 / fireRate) {
+			if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 1 / fireRate*2) {
 				
 			projectile = new Shot(getCenterX(), getCenterY(), aimX, aimY, 1, timestamp);
 			Gravity.playSound("shot");
