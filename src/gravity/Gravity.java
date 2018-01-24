@@ -40,6 +40,7 @@ public class Gravity extends Application {
 	public final static String SCENARIO_CENTRAL_SUN = "Central Sun";
 	public final static String SCENARIO_DOGFIGHT = "Dogfight";
 	public final static String SCENARIO_TWO_SUNS = "Two Suns";
+	public final static String SCENARIO_ALIEN = "Alien";
 
 	public String scenario = SCENARIO_DOGFIGHT;
 
@@ -51,6 +52,7 @@ public class Gravity extends Application {
 	private ObservableList<FlyingObject> flyingObjects = FXCollections.observableArrayList();
 	private ObservableList<Sol> sols = FXCollections.observableArrayList();
 	private ObservableList<Craft> crafts = FXCollections.observableArrayList();
+	private ObservableList<Craft> aliens = FXCollections.observableArrayList();
 	private ObservableList<EnergyBar> energyBars = FXCollections.observableArrayList();
 
 	private final static Sound sound = new Sound();
@@ -178,6 +180,13 @@ public class Gravity extends Application {
 			if (fo instanceof Craft) {
 				FlyingObject projectile = ((Craft) fo).steer(input, timestamp);
 
+				if (projectile != null) {
+					toBeAdded.add(projectile);
+				}
+			}
+			
+			if (fo instanceof Alien) {
+				FlyingObject projectile = ((Alien)fo).react(timestamp, crafts);
 				if (projectile != null) {
 					toBeAdded.add(projectile);
 				}
@@ -355,7 +364,10 @@ public class Gravity extends Application {
 		case SCENARIO_TWO_SUNS:
 			createTwoSunsScenario();
 			break;
-
+			
+		case SCENARIO_ALIEN:
+			createAlienScenario();
+			break;
 		}
 		worldCreated = true;
 	}
@@ -410,6 +422,14 @@ public class Gravity extends Application {
 		sols.add(new Sol((vb.getWidth() / 3), (vb.getHeight() / 3), 50, 10000));
 		sols.add(new Sol((vb.getWidth() * 2 / 3), (vb.getHeight() * 2 / 3), 50, 10000));
 	}
+	
+	private void createAlienScenario() {
+		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
+		createDogfightScenario();
+		Alien alien = new Alien(vb.getWidth() / 2, 500, 30, 0, 0, 400);
+		flyingObjects.addAll(alien);
+		aliens.addAll(alien);
+	}
 
 	private void restart() {
 		energyBars.clear();
@@ -457,7 +477,12 @@ public class Gravity extends Application {
 		miSts.setOnAction(e -> setScenario(SCENARIO_TWO_SUNS));
 		miSts.setToggleGroup(radioGroup);
 
-		menuScenario.getItems().addAll(miSdf, miScs, miSts);
+		RadioMenuItem miSal = new RadioMenuItem(SCENARIO_ALIEN);
+		miSal.setOnAction(e -> setScenario(SCENARIO_ALIEN));
+		miSal.setToggleGroup(radioGroup);
+
+		
+		menuScenario.getItems().addAll(miSdf, miScs, miSts, miSal);
 
 //		Menu menuProps = new Menu("Properties");
 //

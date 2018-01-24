@@ -29,7 +29,7 @@ public class Craft extends FlyingObject {
 	private String keyShield;
 	
 	//shots per second
-	private double fireRate = 10;
+	protected double fireRate = 10;
 
 	//projectile velocity pixel per second
 	private double firePower = 500;
@@ -126,12 +126,12 @@ public class Craft extends FlyingObject {
 		}
 	}
 
-	public void rotateLeft(double speed) {
-		orientation -= speed;
+	public void rotateLeft(double angle) {
+		orientation -= angle;
 	}
 
-	public void rotateRight(double speed) {
-		orientation += speed;
+	public void rotateRight(double angle) {
+		orientation += angle;
 	}
 
 	public void accellerate(long timestamp) {
@@ -141,7 +141,7 @@ public class Craft extends FlyingObject {
 		}
 	}
 
-	private long lastFired = 0;
+	protected long lastFired = 0;
 
 	public FlyingObject fire(long timestamp) {
 		FlyingObject projectile = null;

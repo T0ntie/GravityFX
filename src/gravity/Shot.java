@@ -22,8 +22,6 @@ public class Shot extends FlyingObject {
 
 		double secondsLiving = (timestamp - timeOfBirth) / 1_000_000_000.0;
 
-		// System.out.println(""+ elapsedTime);
-
 		if (secondsLiving < SECONDS_TO_LIVE) {
 			gc.save();
 			//gc.setStroke(Color.LIGHTBLUE);
