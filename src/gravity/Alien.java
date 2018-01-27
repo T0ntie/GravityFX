@@ -11,6 +11,7 @@ public class Alien extends Craft {
 
 	public final static Image ALIEN_SHIP_IMAGE = new Image("imgs/alienship.png");
 	public final static double ALIEN_SHIELD_RADIUS = 70.0;
+	public final static double ALIEN_FIRE_RATE = 5;
 
 	public Alien(double centerX, double centerY, double radius, double xVelocity, double yVelocity, double mass) {
 		super(centerX, centerY, radius, xVelocity, yVelocity, mass, null, null, null, null, null, ALIEN_SHIP_IMAGE, 
@@ -64,7 +65,7 @@ public class Alien extends Craft {
 			if (nearestShotDistance < 200 && nearestShot.getOwner() != this) {
 				shieldUp(timestamp);
 			} else if (nearestCraftDistance < 1000) {
-				if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 1 / fireRate * 2) {
+				if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 1 / ALIEN_FIRE_RATE) {
 
 					projectile = new Shot(getCenterX(), getCenterY(), nearestCraftHeading.getX()+ nearestCraft.getXVelocity(),
 							nearestCraftHeading.getY()+nearestCraft.getYVelocity(), 10, timestamp, this);
