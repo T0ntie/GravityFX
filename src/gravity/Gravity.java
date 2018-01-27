@@ -18,6 +18,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -207,6 +208,7 @@ public class Gravity extends Application {
 
 		flyingObjects.removeAll(toBeRemoved);
 		flyingObjects.addAll(toBeAdded);
+		crafts.removeAll(toBeRemoved);
 
 		// canvas.setHeight(((BorderPane) canvas.getParent()).getHeight());
 		// canvas.setWidth(((BorderPane) canvas.getParent()).getWidth());
@@ -407,6 +409,13 @@ public class Gravity extends Application {
 					vb.getHeight() - 15, 50 * 5, 5);
 			energyBars.addAll(hbar, sbar);
 		}
+		
+		for (int i=0; i< aliens.size(); i++)
+		{
+			Alien alien = (Alien) aliens.get(i);
+			EnergyBar hbar = new EnergyBar(alien.getHealthProperty(), alien.getColor(), xpos[2], vb.getHeight() - 30, 50 * 5, 10);
+			energyBars.addAll(hbar);
+		}
 	}
 
 	private void createCentralSunScenario() {
@@ -425,10 +434,11 @@ public class Gravity extends Application {
 	
 	private void createAlienScenario() {
 		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
-		createDogfightScenario();
 		Alien alien = new Alien(vb.getWidth() / 2, 500, 30, 0, 0, 400);
 		flyingObjects.addAll(alien);
 		aliens.addAll(alien);
+		createDogfightScenario();
+		
 	}
 
 	private void restart() {
