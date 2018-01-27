@@ -14,12 +14,12 @@ public class Shot extends FlyingObject {
 	
 	public boolean explode = false; 
 
-	public Shot(double centerX, double centerY, double xVelocity, double yVelocity, double mass, long timeOfBirth, Craft owner, Color color) {
+	public Shot(double centerX, double centerY, double xVelocity, double yVelocity, double mass, long timeOfBirth, Craft owner) {
 
 		super(centerX, centerY, 4, xVelocity, yVelocity, mass);
 		this.timeOfBirth = timeOfBirth;
 		this.owner = owner;
-		this.color = color;
+		this.color = owner.getColor();
 		
 	}
 
@@ -29,9 +29,7 @@ public class Shot extends FlyingObject {
 
 		if (secondsLiving < SECONDS_TO_LIVE) {
 			gc.save();
-			//gc.setStroke(Color.LIGHTBLUE);
-			//gc.strokeLine(getCenterX(), getCenterY(), getCenterX() + 1, getCenterY() + 1);
-			gc.setStroke(Color.ANTIQUEWHITE);
+			gc.setStroke(color.invert());
 			gc.setFill(color);
 			if (!explode) {
 				gc.strokeOval(getCenterX()-getRadius(), getCenterY()-getRadius(), getRadius(), getRadius());
@@ -48,6 +46,4 @@ public class Shot extends FlyingObject {
 	{
 		return this.owner;
 	}
-	
-
 }

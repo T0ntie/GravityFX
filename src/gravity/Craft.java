@@ -18,6 +18,8 @@ public class Craft extends FlyingObject {
 	public final static Image RED_SHIELD_IMAGE = new Image("imgs/shieldred.png");
 	public final static Image GREEN_SHIELD_IMAGE = new Image("imgs/shieldgreen.png");
 
+	public final static double SHIELD_RADIUS = 50.0;
+	
 	private final Image craftImg;
 	private final Image shieldImg;
 	private final Color color;
@@ -38,7 +40,6 @@ public class Craft extends FlyingObject {
 	//projectile mass
 	private double fireImpact = 10;
 
-
 	final static Image thrustImg = new Image("imgs/thrust.png");
 	final static Image[] explosionImg = new Image[20];
 	static {
@@ -48,18 +49,18 @@ public class Craft extends FlyingObject {
 	}
 
 	final static Random random = new Random();
+
 	long explosion = 0;
 	int showthrust = 0;
 	long shieldIsUp = 0;
-
 	double craftRadius;
-	double shieldRadius = 50;
+	double shieldRadius;
 
 	private final DoubleProperty health;
 	private DoubleProperty shieldPower = new SimpleDoubleProperty(50.0);
 
 	public Craft(double centerX, double centerY, double radius, double xVelocity, double yVelocity, double mass,
-			String keyLeft, String keyRight, String keyThrust, String keyShield, String keyFire, Image craftImg, Image shieldImg, Color color) {
+			String keyLeft, String keyRight, String keyThrust, String keyShield, String keyFire, Image craftImg, Image shieldImg, double shieldRadius, Color color) {
 		super(centerX, centerY, radius, xVelocity, yVelocity, mass);
 		this.keyThrust = keyThrust;
 		this.keyLeft = keyLeft;
@@ -70,6 +71,7 @@ public class Craft extends FlyingObject {
 		this.craftRadius = radius;
 		this.craftImg = craftImg;
 		this.shieldImg = shieldImg;
+		this.shieldRadius = shieldRadius;
 		this.color = color;
 	}
 
@@ -85,10 +87,7 @@ public class Craft extends FlyingObject {
 		return color;
 	}
 
-	// Explosion explosion = null;
-
 	public void show(GraphicsContext gc, long timestamp, long elapsedTime) {
-
 		Image img;
 		if (explosion > 0) {
 			double secondsLiving = (timestamp - explosion) / 1_000_000_000.0;
@@ -115,11 +114,10 @@ public class Craft extends FlyingObject {
 		if (shieldIsUp > 0) {
 			double secondsShieldUp = (timestamp - this.shieldIsUp) / 1_000_000_000.0;
 			shieldPower.set(this.shieldPower.doubleValue() - secondsShieldUp / 5);
-			gc.save();
 			a = new Affine();
 			a.appendRotation(orientation, getCenterX(), getCenterY());
-			//a.appendTranslation(-shieldImg.getWidth() / 2, -shieldImg.getHeight() / 2);
 			a.appendTranslation(-shieldRadius, -shieldRadius);
+			gc.save();
 			gc.setTransform(a);
 			gc.drawImage(shieldImg, getCenterX(), getCenterY(), shieldRadius*2, shieldRadius*2);
 			gc.restore();
@@ -153,7 +151,8 @@ public class Craft extends FlyingObject {
 			double y = -Math.cos(Math.toRadians(orientation)) * firePower;
 			lastFired = timestamp;
 			projectile = new Shot(getCenterX(), getCenterY(), getXVelocity() + x, getYVelocity() + y,
-					fireImpact, timestamp, this, this.getColor());
+					fireImpact, timestamp, this);
+			//Rückstoss
 			addVelocity(-x / 20, -y / 20);
 			Gravity.playSound("shot");
 		}

@@ -18,7 +18,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -46,14 +45,19 @@ public class Gravity extends Application {
 	public String scenario = SCENARIO_DOGFIGHT;
 
 	public final static double BOUNCE_MODERATION = 0.1;
+	public final static double WALL_DAMAGE = 0.05;
+	public final static double CRASH_DAMAGE = 1;
+	public final static double SHOT_DAMAGE_PER_MASS = 0.5;
 
-	public static String STATUS_MSG = "GIT-Version";
+	public final static double MAX_GRAVITY = 100;
+
+	public static String STATUS_MSG = "Gravity 1.0";
 
 	private final FrameStats frameStats = new FrameStats();
 	private ObservableList<FlyingObject> flyingObjects = FXCollections.observableArrayList();
 	private ObservableList<Sol> sols = FXCollections.observableArrayList();
 	private ObservableList<Craft> crafts = FXCollections.observableArrayList();
-	private ObservableList<Craft> aliens = FXCollections.observableArrayList();
+	private ObservableList<Alien> aliens = FXCollections.observableArrayList();
 	private ObservableList<EnergyBar> energyBars = FXCollections.observableArrayList();
 
 	private final static Sound sound = new Sound();
@@ -64,25 +68,24 @@ public class Gravity extends Application {
 
 	public void start(Stage primaryStage) throws Exception {
 
-		primaryStage.setTitle("GIT Gravity");
+		primaryStage.setTitle("Gravity");
 		final BorderPane root = new BorderPane();
-		// final Group root = new Group();
 
 		Scene theScene = new Scene(root, 800, 600);
 		primaryStage.setScene(theScene);
 
 		theScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			@Override
 			public void handle(KeyEvent e) {
 				String code = e.getCode().toString();
-
 				// only add once... prevent duplicates
 				if (!input.contains(code))
 					input.add(code);
-
 			}
 		});
 
 		theScene.setOnKeyReleased(new EventHandler<KeyEvent>() {
+			@Override
 			public void handle(KeyEvent e) {
 				String code = e.getCode().toString();
 				input.remove(code);
@@ -93,7 +96,6 @@ public class Gravity extends Application {
 
 		final Label stats = new Label();
 		stats.setTextFill(Color.RED);
-
 		stats.textProperty().bind(frameStats.textProperty());
 
 		final Pane canvasPane = new Pane();
@@ -104,8 +106,6 @@ public class Gravity extends Application {
 
 		createWorld();
 
-		startAnimation(canvas);
-
 		root.setTop(createMenus(primaryStage));
 
 		primaryStage.setFullScreenExitHint("");
@@ -113,6 +113,7 @@ public class Gravity extends Application {
 		primaryStage.show();
 
 		primaryStage.fullScreenProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
 				Platform.exit();
 			}
@@ -120,6 +121,8 @@ public class Gravity extends Application {
 
 		canvas.setHeight(canvasPane.getHeight());
 		canvas.setWidth(canvasPane.getWidth());
+
+		startAnimation(canvas);
 	}
 
 	private void startAnimation(final Canvas gameCanvas) {
@@ -172,25 +175,20 @@ public class Gravity extends Application {
 				final double deltaX = so.getCenterX() - fo.getCenterX();
 				final double deltaY = so.getCenterY() - fo.getCenterY();
 				final double distance = sqrt(deltaX * deltaX + deltaY * deltaY);
-				final double gravity = Math.min(so.getMass() * fo.getMass() / (distance * distance), 1000);
+				final double gravity = Math.min(so.getMass() * fo.getMass() / (distance * distance), MAX_GRAVITY);
 
 				fo.addVelocity(deltaX / distance * gravity, deltaY / distance * gravity);
 			}
 
-			if (fo instanceof Craft) {
-				FlyingObject projectile = ((Craft) fo).steer(input, timestamp);
-
-				if (projectile != null) {
-					toBeAdded.add(projectile);
-				}
-			}
+			FlyingObject projectile = null;
 
 			if (fo instanceof Alien) {
-				FlyingObject projectile = ((Alien) fo).react(timestamp, flyingObjects);
-				// FlyingObject projectile = ((Alien)fo).react(timestamp, crafts);
-				if (projectile != null) {
-					toBeAdded.add(projectile);
-				}
+				projectile = ((Alien) fo).react(timestamp, flyingObjects);
+			} else if (fo instanceof Craft) {
+				projectile = ((Craft) fo).steer(input, timestamp);
+			}
+			if (projectile != null) {
+				toBeAdded.add(projectile);
 			}
 
 			fo.show(gx, timestamp, elapsedTime);
@@ -198,20 +196,12 @@ public class Gravity extends Application {
 			if (fo.isToBeDespawned()) {
 				toBeRemoved.add(fo);
 			}
-
-			// if (fo instanceof Shot) {
-			// if (((Shot) fo).isToBeDespawned()) {
-			// toBeRemoved.add(fo);
-			// }
-			// }
 		}
 
 		flyingObjects.removeAll(toBeRemoved);
 		flyingObjects.addAll(toBeAdded);
 		crafts.removeAll(toBeRemoved);
-
-		// canvas.setHeight(((BorderPane) canvas.getParent()).getHeight());
-		// canvas.setWidth(((BorderPane) canvas.getParent()).getWidth());
+		aliens.removeAll(toBeRemoved);
 	}
 
 	private void checkCollisions(long timestamp, double maxX, double maxY) {
@@ -241,7 +231,7 @@ public class Gravity extends Application {
 					if (craft1.isShieldUp()) {
 						Gravity.playSound("hitshield");
 					} else {
-						craft1.damage(timestamp, 0.05);
+						craft1.damage(timestamp, WALL_DAMAGE);
 						Gravity.playSound("wall");
 					}
 				}
@@ -250,18 +240,21 @@ public class Gravity extends Application {
 			for (ListIterator<FlyingObject> fastIt = flyingObjects.listIterator(slowIt.nextIndex()); fastIt
 					.hasNext();) {
 				FlyingObject fo2 = fastIt.next();
+				
 				// performance hack: both colliding(...) and bounce(...) need deltaX and deltaY,
 				// so compute them once here:
 				final double deltaX = fo2.getCenterX() - fo1.getCenterX();
 				final double deltaY = fo2.getCenterY() - fo1.getCenterY();
 
 				if (colliding(fo1, fo2, deltaX, deltaY)) {
+					//bounce
 					bounce(fo1, fo2, deltaX, deltaY);
+					//cause damage
 					if (fo1 instanceof Craft) {
 						if (fo2 instanceof Shot) {
 							Craft cr1 = (Craft) fo1;
 							Shot sh2 = (Shot) fo2;
-							cr1.damage(timestamp, sh2.getMass() / 2);
+							cr1.damage(timestamp, sh2.getMass() * SHOT_DAMAGE_PER_MASS);
 							if ((cr1).isShieldUp() == false) {
 								sh2.explode = true;
 								sh2.despawn();
@@ -269,13 +262,11 @@ public class Gravity extends Application {
 							} else {
 								Gravity.playSound("hitshield");
 							}
-
 						} else {
 							Gravity.playSound("crash");
-							((Craft) fo1).damage(timestamp, 1);
-							((Craft) fo2).damage(timestamp, 1);
+							((Craft) fo1).damage(timestamp, CRASH_DAMAGE);
+							((Craft) fo2).damage(timestamp, CRASH_DAMAGE);
 						}
-
 					}
 				}
 			}
@@ -288,7 +279,7 @@ public class Gravity extends Application {
 				if (deltaX * deltaX + deltaY * deltaY <= radiusSum * radiusSum) {
 					if (fo1 instanceof Craft) {
 						((Craft) fo1).damage(timestamp, 0.1);
-						Gravity.sound.playSound("hiss");
+						Gravity.sound.playSound("crackle");
 					}
 				}
 
@@ -382,9 +373,10 @@ public class Gravity extends Application {
 		Craft craft2;
 		if (crafts.isEmpty()) {
 			craft1 = new Craft(500, vb.getHeight() / 2, 20, 10, -200, 40, "A", "D", "W", "S", "SPACE",
-					Craft.BLUE_CRAFT_IMAGE, Craft.BLUE_SHIELD_IMAGE, Color.MEDIUMBLUE);
+					Craft.BLUE_CRAFT_IMAGE, Craft.BLUE_SHIELD_IMAGE, Craft.SHIELD_RADIUS, Color.MEDIUMBLUE);
 			craft2 = new Craft(vb.getWidth() - 500, vb.getHeight() / 2, 20, -10, 200, 40, "LEFT", "RIGHT", "UP",
-					"CLEAR", "INSERT", Craft.RED_CRAFT_IMAGE, Craft.RED_SHIELD_IMAGE, Color.DARKRED);
+					"CLEAR", "INSERT", Craft.RED_CRAFT_IMAGE, Craft.RED_SHIELD_IMAGE, Craft.SHIELD_RADIUS,
+					Color.DARKRED);
 			crafts.addAll(craft1, craft2);
 		} else {
 			craft1 = crafts.get(0);
@@ -436,7 +428,8 @@ public class Gravity extends Application {
 
 	private void createAlienScenario() {
 		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
-		Alien alien = new Alien(vb.getWidth() / 2, 500, 30, 0, 0, 400);
+
+		Alien alien = new Alien(vb.getWidth() / 2, vb.getHeight() / 2, 30, 0, 0, 400);
 		flyingObjects.addAll(alien);
 		aliens.addAll(alien);
 		createDogfightScenario();

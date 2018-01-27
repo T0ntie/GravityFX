@@ -31,6 +31,7 @@ public class Sound {
 		loadSoundEffect("explosion", "explosion0.mp3");
 		loadSoundEffect("explosion", "explosion1.mp3");
 		loadSoundEffect("hiss", "hiss.mp3");
+		loadSoundEffect("crackle", "crackle.mp3");
 	}
 
 	public void loadSoundEffect(String id, String fileName) {
