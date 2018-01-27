@@ -11,7 +11,7 @@ public class Alien extends Craft {
 
 	public final static Image ALIEN_SHIP_IMAGE = new Image("imgs/alienship.png");
 	public final static double ALIEN_SHIELD_RADIUS = 70.0;
-	public final static double ALIEN_FIRE_RATE = 5;
+	public final static double ALIEN_FIRE_RATE = 5; 
 
 	public Alien(double centerX, double centerY, double radius, double xVelocity, double yVelocity, double mass) {
 		super(centerX, centerY, radius, xVelocity, yVelocity, mass, null, null, null, null, null, ALIEN_SHIP_IMAGE, 
