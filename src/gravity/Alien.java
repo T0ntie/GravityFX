@@ -2,31 +2,20 @@ package gravity;
 
 import static java.lang.Math.sqrt;
 
-import java.util.Random;
-
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 public class Alien extends Craft {
 
 	public final static Image ALIEN_SHIP_IMAGE = new Image("imgs/alienship.png");
+	public final static double ALIEN_SHIELD_RADIUS = 70.0;
 
 	public Alien(double centerX, double centerY, double radius, double xVelocity, double yVelocity, double mass) {
-		super(centerX, centerY, radius, xVelocity, yVelocity, mass, null, null, null, null, null, ALIEN_SHIP_IMAGE,
-				GREEN_SHIELD_IMAGE, Color.GREENYELLOW);
-		this.shieldRadius = 100;
-	
+		super(centerX, centerY, radius, xVelocity, yVelocity, mass, null, null, null, null, null, ALIEN_SHIP_IMAGE, 
+				GREEN_SHIELD_IMAGE, ALIEN_SHIELD_RADIUS, Color.GREENYELLOW);
 	}
-
-//	public void show(GraphicsContext gc, long timestamp, long elapsedTime) {
-//		super.show(gc, timestamp, elapsedTime);
-//		if (nearestCraftHeading != null)
-//			gc.strokeLine(getCenterX(), getCenterY(), getCenterX() + nearestCraftHeading.getX(),
-//					getCenterY() + nearestCraftHeading.getY());
-//	}
 
 	Craft nearestCraft = null;
 	double nearestCraftDistance = Double.MAX_VALUE;
@@ -78,7 +67,7 @@ public class Alien extends Craft {
 				if ((shieldIsUp == 0) && (timestamp - lastFired) / 1_000_000_000.0 > 1 / fireRate * 2) {
 
 					projectile = new Shot(getCenterX(), getCenterY(), nearestCraftHeading.getX()+ nearestCraft.getXVelocity(),
-							nearestCraftHeading.getY()+nearestCraft.getYVelocity(), 10, timestamp, this, this.getColor());
+							nearestCraftHeading.getY()+nearestCraft.getYVelocity(), 10, timestamp, this);
 					Gravity.playSound("shot");
 					lastFired = timestamp;
 				}
