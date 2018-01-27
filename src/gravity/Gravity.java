@@ -114,7 +114,6 @@ public class Gravity extends Application {
 
 		primaryStage.fullScreenProperty().addListener(new ChangeListener<Boolean>() {
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				sound.shutdown();
 				Platform.exit();
 			}
 		});
@@ -185,9 +184,10 @@ public class Gravity extends Application {
 					toBeAdded.add(projectile);
 				}
 			}
-			
+
 			if (fo instanceof Alien) {
-				FlyingObject projectile = ((Alien)fo).react(timestamp, crafts);
+				FlyingObject projectile = ((Alien) fo).react(timestamp, flyingObjects);
+				// FlyingObject projectile = ((Alien)fo).react(timestamp, crafts);
 				if (projectile != null) {
 					toBeAdded.add(projectile);
 				}
@@ -366,7 +366,7 @@ public class Gravity extends Application {
 		case SCENARIO_TWO_SUNS:
 			createTwoSunsScenario();
 			break;
-			
+
 		case SCENARIO_ALIEN:
 			createAlienScenario();
 			break;
@@ -409,12 +409,14 @@ public class Gravity extends Application {
 					vb.getHeight() - 15, 50 * 5, 5);
 			energyBars.addAll(hbar, sbar);
 		}
-		
-		for (int i=0; i< aliens.size(); i++)
-		{
+
+		for (int i = 0; i < aliens.size(); i++) {
 			Alien alien = (Alien) aliens.get(i);
-			EnergyBar hbar = new EnergyBar(alien.getHealthProperty(), alien.getColor(), xpos[2], vb.getHeight() - 30, 50 * 5, 10);
-			energyBars.addAll(hbar);
+			EnergyBar hbar = new EnergyBar(alien.getHealthProperty(), alien.getColor(), xpos[2], vb.getHeight() - 30,
+					50 * 5, 10);
+			EnergyBar sbar = new EnergyBar(alien.getShieldPowerProperty(), alien.getColor().brighter(), xpos[2],
+					vb.getHeight() - 15, 50 * 5, 5);
+			energyBars.addAll(hbar, sbar);
 		}
 	}
 
@@ -431,14 +433,14 @@ public class Gravity extends Application {
 		sols.add(new Sol((vb.getWidth() / 3), (vb.getHeight() / 3), 50, 10000));
 		sols.add(new Sol((vb.getWidth() * 2 / 3), (vb.getHeight() * 2 / 3), 50, 10000));
 	}
-	
+
 	private void createAlienScenario() {
 		Rectangle2D vb = Screen.getPrimary().getVisualBounds();
 		Alien alien = new Alien(vb.getWidth() / 2, 500, 30, 0, 0, 400);
 		flyingObjects.addAll(alien);
 		aliens.addAll(alien);
 		createDogfightScenario();
-		
+
 	}
 
 	private void restart() {
@@ -446,6 +448,7 @@ public class Gravity extends Application {
 		flyingObjects.clear();
 		sols.clear();
 		crafts.clear();
+		aliens.clear();
 		worldCreated = false;
 	}
 
@@ -491,24 +494,23 @@ public class Gravity extends Application {
 		miSal.setOnAction(e -> setScenario(SCENARIO_ALIEN));
 		miSal.setToggleGroup(radioGroup);
 
-		
 		menuScenario.getItems().addAll(miSdf, miScs, miSts, miSal);
 
-//		Menu menuProps = new Menu("Properties");
-//
-//		int i = 1;
-//		for (Craft craft : crafts) {
-//			CraftProps props = craft.getProperties();
-//			MenuItem miCp = new MenuItem("Craft Player " + i++);
-//			//ImageView iv = new ImageView(props.getCraftImg());
-//			//iv.setPreserveRatio(true);
-//			//iv.setFitHeight(25);
-//			//miCp.setGraphic(iv);
-//			miCp.setOnAction(e -> props.showPropertyDialog(stage));
-//			menuProps.getItems().add(miCp);
-//		}
-//
-		menuBar.getMenus().addAll(menuGame, menuScenario);//, menuProps);
+		// Menu menuProps = new Menu("Properties");
+		//
+		// int i = 1;
+		// for (Craft craft : crafts) {
+		// CraftProps props = craft.getProperties();
+		// MenuItem miCp = new MenuItem("Craft Player " + i++);
+		// //ImageView iv = new ImageView(props.getCraftImg());
+		// //iv.setPreserveRatio(true);
+		// //iv.setFitHeight(25);
+		// //miCp.setGraphic(iv);
+		// miCp.setOnAction(e -> props.showPropertyDialog(stage));
+		// menuProps.getItems().add(miCp);
+		// }
+		//
+		menuBar.getMenus().addAll(menuGame, menuScenario);// , menuProps);
 		return menuBar;
 	}
 
@@ -527,6 +529,7 @@ public class Gravity extends Application {
 			frameCount++;
 			text.set(toString());
 		}
+
 		public ReadOnlyStringProperty textProperty() {
 			return text.getReadOnlyProperty();
 		}

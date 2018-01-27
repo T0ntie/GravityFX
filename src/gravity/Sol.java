@@ -12,8 +12,7 @@ public class Sol extends GravityObject{
 	
 	public Sol(double centerX, double centerY, double radius, double mass)
 	{
-		super(centerX, centerY, radius, mass);		System.out.println("Whats up");
-
+		super(centerX, centerY, radius, mass);
         imageSide = 2*radius*RADIUS_RATIO/Math.sqrt(2);
 	}
 	

@@ -16,6 +16,7 @@ public class Craft extends FlyingObject {
 	public final static Image RED_CRAFT_IMAGE = new Image("imgs/craftred.png");
 	public final static Image BLUE_SHIELD_IMAGE = new Image("imgs/shieldblue.png");
 	public final static Image RED_SHIELD_IMAGE = new Image("imgs/shieldred.png");
+	public final static Image GREEN_SHIELD_IMAGE = new Image("imgs/shieldgreen.png");
 
 	private final Image craftImg;
 	private final Image shieldImg;
@@ -117,9 +118,10 @@ public class Craft extends FlyingObject {
 			gc.save();
 			a = new Affine();
 			a.appendRotation(orientation, getCenterX(), getCenterY());
-			a.appendTranslation(-shieldImg.getWidth() / 2, -shieldImg.getHeight() / 2);
+			//a.appendTranslation(-shieldImg.getWidth() / 2, -shieldImg.getHeight() / 2);
+			a.appendTranslation(-shieldRadius, -shieldRadius);
 			gc.setTransform(a);
-			gc.drawImage(shieldImg, getCenterX(), getCenterY());
+			gc.drawImage(shieldImg, getCenterX(), getCenterY(), shieldRadius*2, shieldRadius*2);
 			gc.restore();
 		} else {
 			shieldPower.set(Math.min(this.shieldPower.doubleValue() + elapsedTime / 1_000_000_000.0, 50));
@@ -151,7 +153,7 @@ public class Craft extends FlyingObject {
 			double y = -Math.cos(Math.toRadians(orientation)) * firePower;
 			lastFired = timestamp;
 			projectile = new Shot(getCenterX(), getCenterY(), getXVelocity() + x, getYVelocity() + y,
-					fireImpact, timestamp);
+					fireImpact, timestamp, this, this.getColor());
 			addVelocity(-x / 20, -y / 20);
 			Gravity.playSound("shot");
 		}
