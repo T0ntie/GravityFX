@@ -23,6 +23,7 @@ public class Craft extends FlyingObject {
 	private final Image craftImg;
 	private final Image shieldImg;
 	private final Color color;
+	private int score;
 	
 	//Key codes
 	private String keyFire;
@@ -111,6 +112,9 @@ public class Craft extends FlyingObject {
 					getCenterY() + craftImg.getHeight());
 		}
 		gc.restore();
+		gc.setStroke(this.getColor());
+		gc.strokeText("" + this.score, getCenterX(), getCenterY()-50);
+		
 		if (shieldIsUp > 0) {
 			double secondsShieldUp = (timestamp - this.shieldIsUp) / 1_000_000_000.0;
 			shieldPower.set(this.shieldPower.doubleValue() - secondsShieldUp / 5);
@@ -221,5 +225,11 @@ public class Craft extends FlyingObject {
 
 	public boolean isShieldUp() {
 		return (this.shieldIsUp > 0);
+	}
+	
+	public void score()
+	{
+		this.score++;
+		Gravity.STATUS_MSG = "Score: " + score;
 	}
 }

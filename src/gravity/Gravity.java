@@ -258,6 +258,10 @@ public class Gravity extends Application {
 							if ((cr1).isShieldUp() == false) {
 								sh2.explode = true;
 								sh2.despawn();
+								if (sh2.getOwner() != cr1)
+								{
+									sh2.getOwner().score();
+								}
 								Gravity.playSound("hitcraft");
 							} else {
 								Gravity.playSound("hitshield");
