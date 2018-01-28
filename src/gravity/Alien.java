@@ -69,6 +69,11 @@ public class Alien extends Craft {
 
 					projectile = new Shot(getCenterX(), getCenterY(), nearestCraftHeading.getX()+ nearestCraft.getXVelocity(),
 							nearestCraftHeading.getY()+nearestCraft.getYVelocity(), 10, timestamp, this);
+
+//					double x = Math.sin(Math.toRadians(orientation)) * 1000;
+//					double y = -Math.cos(Math.toRadians(orientation)) * 1000;
+//
+//					projectile = new Shot(getCenterX(), getCenterY(), getXVelocity()+x, getYVelocity()+y, 10, timestamp, this);
 					Gravity.playSound("shot");
 					lastFired = timestamp;
 				}

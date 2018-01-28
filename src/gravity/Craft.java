@@ -135,14 +135,32 @@ public class Craft extends FlyingObject {
 		}
 	}
 
-	public void rotateLeft(double angle) {
-		orientation -= angle;
+	long lastRotation = 0;
+	double rotationStep = 1;
+	private void rotate(int sign, long timestamp)
+	{
+		long elapsedTime = timestamp - lastRotation;
+		if (elapsedTime / 1_000_000_000.0 < 0.1)
+		{
+			rotationStep+= 0.3;
+		}
+		else
+		{
+			rotationStep = 1;
+		}
+		orientation += Math.min(7, rotationStep)*sign;
+		lastRotation = timestamp;
+	}
+	
+	public void rotateRight(long timestamp) {
+		rotate(1, timestamp);
 	}
 
-	public void rotateRight(double angle) {
-		orientation += angle;
+	public void rotateLeft(long timestamp) {
+		rotate(-1, timestamp);
 	}
 
+	
 	public void accellerate(long timestamp) {
 		if (shieldIsUp == 0) {
 			this.addVelocity(Math.sin(Math.toRadians(orientation)) * 10, -Math.cos(Math.toRadians(orientation)) * 10);
@@ -173,11 +191,11 @@ public class Craft extends FlyingObject {
 		FlyingObject projectile = null;
 
 		if (input.contains(keyLeft)) {
-			rotateLeft(5);
+			rotateLeft(timestamp);
 		}
 
 		if (input.contains(keyRight)) {
-			rotateRight(5);
+			rotateRight(timestamp);
 		}
 
 		if (input.contains(keyThrust)) {

@@ -11,16 +11,17 @@ public class Shot extends FlyingObject {
 	private final static Image burstImg = new Image("imgs/shotexplode.png");
 	private final Craft owner;
 	private Color color;
-	
-	public boolean explode = false; 
 
-	public Shot(double centerX, double centerY, double xVelocity, double yVelocity, double mass, long timeOfBirth, Craft owner) {
+	public boolean explode = false;
+
+	public Shot(double centerX, double centerY, double xVelocity, double yVelocity, double mass, long timeOfBirth,
+			Craft owner) {
 
 		super(centerX, centerY, 4, xVelocity, yVelocity, mass);
 		this.timeOfBirth = timeOfBirth;
 		this.owner = owner;
 		this.color = owner.getColor();
-		
+
 	}
 
 	public void show(GraphicsContext gc, long timestamp, long elapsedTime) {
@@ -32,18 +33,18 @@ public class Shot extends FlyingObject {
 			gc.setStroke(color.invert());
 			gc.setFill(color);
 			if (!explode) {
-				gc.strokeOval(getCenterX()-getRadius(), getCenterY()-getRadius(), getRadius(), getRadius());
-				gc.fillOval(getCenterX()-getRadius(), getCenterY()-getRadius(), getRadius(), getRadius());
-		}else
-				gc.drawImage(burstImg, getCenterX()-burstImg.getWidth()/2, getCenterY()-burstImg.getHeight()/2);
+				gc.strokeOval(getCenterX() - getRadius(), getCenterY() - getRadius(), getRadius(), getRadius());
+				gc.fillOval(getCenterX() - getRadius(), getCenterY() - getRadius(), getRadius(), getRadius());
+
+			} else
+				gc.drawImage(burstImg, getCenterX() - burstImg.getWidth() / 2, getCenterY() - burstImg.getHeight() / 2);
 			gc.restore();
 		} else {
 			despawn();
 		}
 	}
-	
-	public Craft getOwner()
-	{
+
+	public Craft getOwner() {
 		return this.owner;
 	}
 }
