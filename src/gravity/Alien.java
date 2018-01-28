@@ -58,10 +58,10 @@ public class Alien extends Craft {
 
 	public FlyingObject react(long timestamp, ObservableList<FlyingObject> flyingObjects) {
 		FlyingObject projectile = null;
+		shieldDown(timestamp);
 		detectNearestObjects(flyingObjects);
 		if (nearestCraft != null)
 			autoPilot(nearestCraftHeading.getX(), nearestCraftHeading.getY());
-
 			if (nearestShotDistance < 200 && nearestShot.getOwner() != this) {
 				shieldUp(timestamp);
 			} else if (nearestCraftDistance < 1000) {
