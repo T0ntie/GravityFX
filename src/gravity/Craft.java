@@ -114,6 +114,11 @@ public class Craft extends FlyingObject {
 		gc.restore();
 		gc.setStroke(this.getColor());
 		gc.strokeText("" + this.score, getCenterX(), getCenterY()-50);
+		gc.setFill(this.getColor().brighter());
+		gc.fillRect(getCenterX()-25, getCenterY()+50, getHealthProperty().doubleValue(), 4);
+		gc.strokeRect(getCenterX()-25, getCenterY()+50, 50, 4);
+		gc.fillRect(getCenterX()-25, getCenterY()+57, getShieldPowerProperty().doubleValue(), 3);
+		gc.strokeRect(getCenterX()-25, getCenterY()+57, 50, 3);
 		
 		if (shieldIsUp > 0) {
 			double secondsShieldUp = (timestamp - this.shieldIsUp) / 1_000_000_000.0;
